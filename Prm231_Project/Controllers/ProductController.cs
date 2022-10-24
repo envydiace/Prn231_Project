@@ -22,30 +22,31 @@ namespace Prm231_Project.Controllers
         }
 
         [HttpGet("[action]")]
-        public ActionResult<List<ProductDTO>> GetAllProduct()
+        public async Task<ActionResult<List<ProductDTO>>> GetAllProduct()
         {
-            return Ok(mapper.Map<List<ProductDTO>>(_context.Products.Include(p => p.Category)));
+            var result = await _context.Products.Include(p => p.Category).ToListAsync();
+            return Ok(mapper.Map<List<ProductDTO>>(result));
         }
         [HttpGet("[action]")]
-        public IActionResult GetProductHot(int categoryId, int pageIndex = 1, int pageSize = 4)
+        public async Task<ActionResult<PagingProductDTO>> GetProductBestSale(int categoryId, int pageIndex = 1, int pageSize = 4)
         {
-            var list = (from orderDetail in _context.OrderDetails 
-                       group orderDetail by orderDetail.ProductId into product
-                       select new
-                       {
-                           ProductId = product.Key,
-                           Discount = product.Max(p => p.Discount)
-                       }).OrderByDescending(od => od.Discount)
+            var list = await (from orderDetail in _context.OrderDetails
+                              group orderDetail by orderDetail.ProductId into product
+                              select new
+                              {
+                                  ProductId = product.Key,
+                                  Discount = product.Max(p => p.Discount)
+                              }).OrderByDescending(od => od.Discount)
                        .ThenByDescending(od => od.ProductId)
-                       .Join(_context.Products, od => od.ProductId, p => p.ProductId, 
-                       (od ,p) => p)
-                       .Where( p => categoryId == 0 || p.CategoryId == categoryId)
-                       ;
+                       .Join(_context.Products, od => od.ProductId, p => p.ProductId, (od, p) => p)
+                       .Where(p => categoryId == 0 || p.CategoryId == categoryId)
+                       .Include(p => p.Category)
+                        .Include(p => p.OrderDetails)
+                       .ToListAsync();
             int total = list.Count();
             int totalPages = total % pageSize == 0 ? (total / pageSize) : ((total / pageSize) + 1);
             var value = mapper.Map<ICollection<ProductDTO>>(
-                list.Include(p => p.Category)
-                .Include(p => p.OrderDetails)
+                list
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize));
             return Ok(new PagingProductDTO
@@ -58,15 +59,40 @@ namespace Prm231_Project.Controllers
             });
         }
         [HttpGet("[action]")]
-        public ActionResult<PagingProductDTO> GetProductBestSale(int categoryId= 0, int pageIndex = 1, int pageSize = 4)
+        public async Task< ActionResult<PagingProductDTO>> GetProductHot(int categoryId = 0, int pageIndex = 1, int pageSize = 4)
         {
-            var list = _context.Products.Where(  p => categoryId == 0 || p.CategoryId == categoryId);
+            var list = await _context.Products.Where(p => categoryId == 0 || p.CategoryId == categoryId).Include(p => p.Category)
+                .Include(p => p.OrderDetails)
+                .ToListAsync();
             int total = list.Count();
             int totalPages = total % pageSize == 0 ? (total / pageSize) : ((total / pageSize) + 1);
             var value = mapper.Map<ICollection<ProductDTO>>(
-                list.Include(p => p.Category)
-                .Include(p => p.OrderDetails)
+                list
                 .OrderByDescending(p => p.OrderDetails.Count)
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize));
+            return Ok(new PagingProductDTO
+            {
+                Total = total,
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                TotalPages = totalPages,
+                Values = value
+            });
+        }
+
+        [HttpGet("[action]")]
+        public async Task<ActionResult<PagingProductDTO>> GetProductNew(int categoryId = 0, int pageIndex = 1, int pageSize = 4)
+        {
+            var list = await _context.Products
+                .Where(p => categoryId == 0 || p.CategoryId == categoryId)
+                .Include(p => p.Category)
+                .ToListAsync();
+            int total = list.Count();
+            int totalPages = total % pageSize == 0 ? (total / pageSize) : ((total / pageSize) + 1);
+            var value = mapper.Map<ICollection<ProductDTO>>(
+                list
+                .OrderByDescending(p => p.ProductId)
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize));
             return Ok(new PagingProductDTO
@@ -95,7 +121,7 @@ namespace Prm231_Project.Controllers
 
         [Authorize(Policy = "AdminOnly")]
         [HttpPost("[action]")]
-        public async Task<IActionResult> Create([FromForm]ProductAddDTO product)
+        public async Task<IActionResult> Create([FromForm] ProductAddDTO product)
         {
             if (ModelState.IsValid)
             {
@@ -112,12 +138,12 @@ namespace Prm231_Project.Controllers
 
         [Authorize(Policy = "AdminOnly")]
         [HttpDelete("[action]/{id}")]
-        public ActionResult<string> Delete(int id)
+        public async Task< ActionResult<string>> Delete(int id)
         {
             try
             {
-                var product = _context.Products
-                .Where(e => e.ProductId == id).FirstOrDefault();
+                var product = await _context.Products
+                .Where(e => e.ProductId == id).FirstOrDefaultAsync();
                 if (product != null)
                 {
                     _context.Remove<Product>(product);
@@ -138,9 +164,9 @@ namespace Prm231_Project.Controllers
 
         [Authorize(Policy = "AdminOnly")]
         [HttpPut("[action]")]
-        public IActionResult Update([FromForm]ProductEditDTO product)
+        public async Task < IActionResult> Update([FromForm] ProductEditDTO product)
         {
-            var emp = _context.Products.Where(e => e.ProductId == product.ProductId).AsNoTracking().FirstOrDefault();
+            var emp = await _context.Products.Where(e => e.ProductId == product.ProductId).AsNoTracking().FirstOrDefaultAsync();
             if (emp != null)
             {
                 if (ModelState.IsValid)

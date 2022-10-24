@@ -24,21 +24,22 @@ namespace Prm231_Project.Controllers
 
         [HttpGet("[action]")]
         [Authorize]
-        public ActionResult<List<Customer>> GetAllCustomer()
+        public async Task< ActionResult<List<Customer>>> GetAllCustomer()
         {
-            return Ok(_context.Customers);
+            var result = await _context.Customers.ToListAsync();
+            return Ok(result);
         }
 
         [HttpGet("[action]")]
         [Authorize]
-        public ActionResult<Customer> GetCustomer()
+        public async Task< ActionResult<Customer>> GetCustomer()
         {
             var header = Request.Headers["Authorization"];
             var token = header[0].Split(" ")[1];
             var handler = new JwtSecurityTokenHandler();
             var jwt = handler.ReadJwtToken(token);
             var CustomerId = jwt.Claims.First(claim => claim.Type == "CustomerId").Value;
-            var customer = _context.Customers.Include(c => c.Accounts).Where(c => c.CustomerId.Equals(CustomerId)).FirstOrDefault();
+            var customer = await _context.Customers.Include(c => c.Accounts).Where(c => c.CustomerId.Equals(CustomerId)).FirstOrDefaultAsync();
             return Ok(mapper.Map<CustomerDTO>(customer));
         }
     }

@@ -23,7 +23,7 @@ namespace Prm231_Project.Controllers
         }
         [HttpGet("[action]")]
         [Authorize]
-        public IActionResult GetCustomerOrder()
+        public async Task < IActionResult> GetCustomerOrder()
         {
             var header = Request.Headers["Authorization"];
             var token = header[0].Split(" ")[1];
@@ -31,13 +31,11 @@ namespace Prm231_Project.Controllers
             var handler = new JwtSecurityTokenHandler();
             var jwt = handler.ReadJwtToken(token);
             var CustomerId = jwt.Claims.First(claim => claim.Type == "CustomerId").Value;
-            return Ok(
-                mapper.Map<List<OrderDTO>>(
-                _context.Orders.Where(o => o.CustomerId.Equals(CustomerId))
+            var result = await _context.Orders.Where(o => o.CustomerId.Equals(CustomerId))
                 .Include(o => o.OrderDetails)
                 .ThenInclude(od => od.Product)
-                )
-                );
+                .ToListAsync();
+            return Ok( mapper.Map<List<OrderDTO>>(result ) ) ;
         }
     }
 }

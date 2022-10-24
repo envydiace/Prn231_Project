@@ -19,10 +19,10 @@ namespace Prm231_Project.Controllers
         }
 
         [EnableQuery(PageSize = 4)]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            var products = dbcontext.Products;
-            return Ok( products.Include(p => p.OrderDetails));
+            var products = await dbcontext.Products.Include(p => p.OrderDetails).ToListAsync();
+            return Ok( products);
         }
         [EnableQuery]
         public IActionResult Get(int key)
