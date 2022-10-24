@@ -19,16 +19,6 @@ static IEdmModel GetEdmModel()
 
 var builder = WebApplication.CreateBuilder(args);
 
-//builder.Services.AddDistributedMemoryCache();
-
-//builder.Services.AddSession(options =>
-//{
-//    options.Cookie.Name = ".Ndanh.Session";
-//    options.IdleTimeout = TimeSpan.FromMinutes(10);
-//    options.Cookie.HttpOnly = true;
-//    options.Cookie.IsEssential = true;
-//});
-
 builder.Services.AddCors();
 
 builder.Services.AddDbContext<PRN231DBContext>(opt
@@ -65,6 +55,17 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddDistributedMemoryCache();
+
+//builder.Services.AddDistributedMemoryCache();
+
+//builder.Services.AddSession(options =>
+//{
+//    options.Cookie.Name = ".Ndanh.Session";
+//    options.IdleTimeout = TimeSpan.FromMinutes(10);
+//    options.Cookie.HttpOnly = true;
+//    options.Cookie.IsEssential = true;
+//});
+
 builder.Services.AddSession();
 
 builder.Services.AddSwaggerGen(option =>
@@ -108,8 +109,6 @@ app.MapControllers();
 app.UseAuthentication();
 
 app.UseAuthorization();
-
-//app.UseSession();
 
 app.UseSwagger();
 
