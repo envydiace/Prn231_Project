@@ -166,8 +166,8 @@ namespace Prm231_Project.Controllers
         [HttpPut("[action]")]
         public async Task < IActionResult> Update([FromForm] ProductEditDTO product)
         {
-            var emp = await _context.Products.Where(e => e.ProductId == product.ProductId).AsNoTracking().FirstOrDefaultAsync();
-            if (emp != null)
+            var pro = await _context.Products.Where(e => e.ProductId == product.ProductId).AsNoTracking().FirstOrDefaultAsync();
+            if (pro != null)
             {
                 if (ModelState.IsValid)
                 {
