@@ -73,7 +73,7 @@ namespace Prm231_Project.Controllers
             return result;
         }
         [HttpPost("[action]")]
-        public async Task<IActionResult> Register(RegisterDTO registerDTO)
+        public async Task<IActionResult> Register([FromForm] RegisterDTO registerDTO)
         {
             Account account = await _context.Accounts.FirstOrDefaultAsync(acc => acc.Email.Equals(registerDTO.Email));
 

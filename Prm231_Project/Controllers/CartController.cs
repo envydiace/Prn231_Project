@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using Prm231_Project.DTO;
 using Prm231_Project.Models;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json;
 using System.Web;
 
@@ -140,13 +142,51 @@ namespace Prm231_Project.Controllers
             }
             return Ok("Update Success!");
         }
-
-        //[HttpPost("[action]")]
-        //public IActionResult OrderCart()
-        //{
-
-        //}
-
-
+        
+        [HttpPost("[action]")]
+        public async Task<IActionResult> OrderCartAsync([FromForm] CustomerOrderInfoDTO custInfo)
+        {
+            var listOrderDetails = this.GetCustomerCart();
+            var header = Request.Headers["Authorization"];
+            string cusId = "";
+            
+            if (header.Count > 0)
+            {
+                var token = header[0].Split(" ")[1];
+                var handler = new JwtSecurityTokenHandler();
+                var jwt = handler.ReadJwtToken(token);
+                cusId = jwt.Claims.First(claim => claim.Type == "CustomerId").Value;
+            }else
+            {
+                Random random = new Random();
+                const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                bool existed = true;
+                while (existed)
+                {
+                    cusId = new string(Enumerable.Repeat(chars, 5)
+                        .Select(s => s[random.Next(s.Length)]).ToArray());
+                    Customer customer = await _context.Customers.FirstOrDefaultAsync(c => c.CustomerId.Equals(cusId));
+                    if (customer == null)
+                    {
+                        existed = false;
+                    }
+                }
+                Customer c = new Customer
+                {
+                    CustomerId = cusId,
+                    CompanyName = custInfo.CompanyName != null ? custInfo.CompanyName : "",
+                    ContactName = custInfo.ContactName,
+                    ContactTitle = custInfo.ContactTitle,
+                    Address = custInfo.Address
+                };
+                return Ok(c);
+            }
+            //Order order = new Order
+            //{
+            //    OrderDate = DateTime.Now,
+            //    RequiredDate = custInfo.RequiredDate
+            //};
+            return Ok(cusId);
+        }
     }
 }
