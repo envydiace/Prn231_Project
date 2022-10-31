@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script src="lib/jquery/dist/jquery.min.js"></script>
+    <script src="js/product.js"></script>
+    <script src="js/permission.js" ></script>
+</head>
+<script>
+</script>
+<script>
+    getAllCategory();
+    getProducts();
+</script>
+
+<body>
+    <div id="container">
+        <div id="header">
+            <div id="logo-admin">
+                Ecommerce Admin
+            </div>
+            <div id="banner-admin">
+                <ul>
+                    <li><a href="signin.html">SignIn</a></li>
+                    <li><a href="#" onclick="Logout();">SignOut</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="content">
+            <div id="content-left">
+                <ul>
+                    <a href="dashboard.html">
+                        <li>Dashboard</li>
+                    </a>
+                    <a href="order.html">
+                        <li>Orders</li>
+                    </a>
+                    <a href="product.html">
+                        <li>Products</li>
+                    </a>
+                    <a href="#">
+                        <li>Customers</li>
+                    </a>
+                </ul>
+            </div>
+            <div id="content-right">
+                <div class="path-admin">PRODUCTS LIST</b></div>
+                <div class="content-main">
+                    <div id="content-main-dashboard">
+                        <div id="product-title-header">
+                            <div id="product-title-1" style="width: 25%;">
+                                <b>Filter by Catetory:</b>
+                                <form>
+                                    <select id="select-category" name="ddlCategory">
+                                        <option value="0" selected>All</option>
+                                    </select>
+                                    <input type="button"  onclick="getProducts();" value="Filter">
+                                </form>
+                            </div>
+                            <div id="product-title-2" style="width: 55%;">
+                                    <input type="text" id="search" name="txtSearch" placeholder="Enter product name to search" />
+                                    <input type="button" onclick="getProducts();" value="Search" />
+                            </div>
+                            <div id="product-title-3" style="width: 20%;">
+                                <a href="create-product.html">Create a new Product</a>
+                                <form action="">
+                                    <label for="upload-file">Import .xls or .xlsx file</label>
+                                    <input type="file" name="file" id="upload-file" />
+                                </form>
+                            </div>
+                        </div>
+                        <div id="order-table-admin">
+                            <table id="orders">
+                                <tr>
+                                    <th>ProductID</th>
+                                    <th>ProductName</th>
+                                    <th>UnitPrice</th>
+                                    <th>Unit</th>
+                                    <th>UnitsInStock</th>
+                                    <th>Category</th>
+                                    <th>Discontinued</th>
+                                    <th></th>
+                                </tr>
+                            </table>
+                        </div>
+                        <div id="paging">
+                            <div class="pagination">
+                                <a href="#">&laquo;</a>
+                                <a href="#">1</a>
+                                <a href="#" class="active">2</a>
+                                <a href="#">3</a>
+                                <a href="#">4</a>
+                                <a href="#">5</a>
+                                <a href="#">6</a>
+                                <a href="#">&raquo;</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="footer-admin">footer</div>
+    </div>
+</body>
+
+</html>

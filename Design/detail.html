@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+    <link href="css/style.css" rel="stylesheet"/>
+    <script src="lib/jquery/dist/jquery.min.js"></script>
+    <script src="js/detail.js"></script>
+    <script src="js/cart.js"></script>
+</head>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+    getProduct(productId) ;
+</script>
+<body>
+    <div id="container">
+        <div id="header">
+            <div id="logo">
+                <a href="index.html"><img src="img/logo.png"/></a>
+            </div>
+            <div id="banner">
+                <ul>
+                    <li><a href="cart.html">Cart: 0</a></li>
+                    <li><a href="signin.html">SignIn</a></li>
+                    <li><a href="signup.html">SignUp</a></li>
+                    <li><a href="profile.html">Profile</a></li>
+                    <li><a href="#">SignOut</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="content">
+            <div id="content-detail">
+                <div id="content-title">
+                    <a href="index.html">Home</a> >
+                    <a href="category1.html">Category 1</a> >
+                    Model: SP1
+                </div>
+                <div id="product">
+                    <div id="product-name">
+                        <h2>Product 1</h2>
+                        <div id="product-detail">
+                            <div id="product-detail-left">
+                                <div id="product-img">
+                                    <img src="img/1.jpg"/>
+                                </div>
+                                <div id="product-img-items">
+                                    <div><a href="#"><img src="img/1.jpg"/></a></div>
+                                    <div><a href="#"><img src="img/1.jpg"/></a></div>
+                                    <div><a href="#"><img src="img/1.jpg"/></a></div>
+                                    <div><a href="#"><img src="img/1.jpg"/></a></div>
+                                </div>
+                            </div>
+                            <div id="product-detail-right">
+                                <div id="product-detail-right-content">
+                                    <div id="product-price">$ 1000</div>
+                                    <div id="product-status">In stock</div>
+                                    <div id="product-detail-buttons">
+                                        <div id="product-detail-button">
+                                            <input type="button" value="BUY NOW">
+                                            <input type="button" onclick="addProductToCart();" value="ADD TO CART" style="background-color: #fff; color:red;border: 1px solid gray;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="info-detail">
+                    <div id="info-detail-title">
+                        <h2>Information deltail</h2>
+                        <div style="margin:10px auto;">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum, debitis. Asperiores soluta eveniet eos accusantium doloremque cum suscipit ducimus enim at sapiente mollitia consequuntur dicta quaerat, sunt voluptates autem. Quam!
+                            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rem illum autem veritatis maxime corporis quod quibusdam nostrum eaque laborum numquam quos unde eveniet aut, exercitationem voluptatum veniam fugiat, debitis esse?
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio eligendi ratione vitae nobis numquam dolorum assumenda saepe enim cumque blanditiis, deleniti neque voluptate vel ducimus in omnis harum aut nisi.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="footer">footer</div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+    <link href="css/style.css" rel="stylesheet" />
+    <link href="css/cart.css" rel="stylesheet" />
+    <script src="lib/jquery/dist/jquery.min.js"></script>
+    <script src="js/cart.js"></script>
+</head>
+<script>
+    getCart();
+</script>
+
+<body>
+    <div id="container">
+        <div id="header">
+            <div id="logo">
+                <a href="index.html"><img src="img/logo.png" /></a>
+            </div>
+            <div id="banner">
+                <ul>
+                    <li><a href="cart.html">Cart: 0</a></li>
+                    <li><a href="signin.html">SignIn</a></li>
+                    <li><a href="signup.html">SignUp</a></li>
+                    <li><a href="profile.html">Profile</a></li>
+                    <li><a href="#">SignOut</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="content">
+            <div id="cart">
+                <div id="cart-title">
+                    <h3>SHOPPING CART</h3>
+                </div>
+                <div id="cart-content">
+                    <div class="cart-item">
+                        <div class="cart-item-infor">
+                            <div class="cart-item-img">
+                                <img src="img/1.jpg" />
+                            </div>
+                            <div class="cart-item-name">
+                                <a href="detail.html?id=1">Product 1</a>
+                            </div>
+                            <div class="cart-item-price">
+                                1000 $
+                            </div>
+                            <div class="cart-item-button">
+                                <a href="#">Remove</a>
+                            </div>
+                        </div>
+                        <div class="cart-item-function">
+                            <a href="#">-</a>
+                            <a href="#">+</a>
+                            <input type="text" value="1" disabled />
+                        </div>
+                    </div>
+                    <div class="cart-item">
+                        <div class="cart-item-infor">
+                            <div class="cart-item-img">
+                                <img src="img/1.jpg" />
+                            </div>
+                            <div class="cart-item-name">
+                                <a href="detail.html?id=1">Product 1</a>
+                            </div>
+                            <div class="cart-item-price">
+                                1000 $
+                            </div>
+                            <div class="cart-item-button">
+                                <a href="#">Remove</a>
+                            </div>
+                        </div>
+                        <div class="cart-item-function">
+                            <a href="#">-</a>
+                            <a href="#">+</a>
+                            <input type="text" value="2" disabled />
+                        </div>
+                    </div>
+                    <div class="cart-item">
+                        <div class="cart-item-infor">
+                            <div class="cart-item-img">
+                                <img src="img/1.jpg" />
+                            </div>
+                            <div class="cart-item-name">
+                                <a href="detail.html?id=1">Product 1</a>
+                            </div>
+                            <div class="cart-item-price">
+                                1000 $
+                            </div>
+                            <div class="cart-item-button">
+                                <a href="#">Remove</a>
+                            </div>
+                        </div>
+                        <div class="cart-item-function">
+                            <a href="#">-</a>
+                            <a href="#">+</a>
+                            <input type="text" value="1" disabled />
+                        </div>
+                    </div>
+                </div>
+                <div id="cart-summary">
+                    <div id="cart-summary-content">Total amount: <span style="color:red">3000 $</span></div>
+                </div>
+                <form method="post">
+                    <div id="customer-info">
+                        <div id="customer-info-content">
+                            <h3>CUSTOMER INFORMATION:</h3>
+                            <div id="customer-info-detail">
+                                <div id="customer-info-left">
+                                    <input type="text" placeholder="Company name *" /><br />
+                                    <input type="text" placeholder="Contact name *" /><br />
+                                </div>
+                                <div id="customer-info-right">
+                                    <input type="text" placeholder="Contact title *" /><br />
+                                    <input type="text" placeholder="Address *" /><br />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="customer-info">
+                        <div id="customer-info-content">
+                            <h3>PAYMENT METHODS:</h3>
+                            <div id="customer-info-payment">
+                                <div>
+                                    <input type="radio" name="rbPaymentMethod" checked />
+                                    Payment C.O.D - Payment on delivery
+                                </div>
+                                <div>
+                                    <input type="radio" name="rbPaymentMethod" disabled />
+                                    Payment via online payment gateway
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="cart-order">
+                        <input type="button" value="ORDER" />
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="footer">footer</div>
+    </div>
+</body>
+
+</html>

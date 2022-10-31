@@ -1,0 +1,12 @@
+#content-left ul a.active li {
+    background: sienna ;
+    color: white;
+    border-radius: 5px;
+}
+.paging{
+    text-align: center;
+    margin-top: 15px;
+}
+.pagination:hover{
+    cursor: pointer;
+}

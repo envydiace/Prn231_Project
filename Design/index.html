@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+    <link href="css/style.css" rel="stylesheet" />
+    <link href="css/index.css" rel="stylesheet" />
+    <script src="lib/jquery/dist/jquery.min.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/permission.js"></script>
+</head>
+
+
+<body>
+    <div id="container">
+        <div id="header">
+            <div id="logo">
+                <a href="index.html"><img src="img/logo.png" /></a>
+            </div>
+            <div id="banner">
+                <ul>
+                    <li><a href="cart.html">Cart: 0</a></li>
+                    <li><a id="li-signin" href="signin.html">SignIn</a></li>
+                    <li><a id="li-signup" href="signup.html">SignUp</a></li>
+                    <li><a id="li-profile" href="profile.html">Profile</a></li>
+                    <li><a id="li-signout" onclick="Logout();" href="#">SignOut</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="content">
+            <div id="content-left">
+                <h3>CATEGORY</h3>
+                <ul id="ul-category">
+                  
+                </ul>
+            </div>
+            <div id="content-right">
+                <!-- <div class="path">Hot</b></div>
+                <div class="content-main">
+                    <div class="product">
+                        <a href="detail.html"><img src="img/1.jpg" width="100%" /></a>
+                        <div class="name"><a href="detail.html">Product 1</a></div>
+                        <div class="price">$1000</div>
+                        <div><a href="">Buy now</a></div>
+                    </div>
+                    <div class="product">
+                        <a href=""><img src="img/1.jpg" width="100%" /></a>
+                        <div class="name"><a href="">Product 1</a></div>
+                        <div class="price">$1000</div>
+                        <div><a href="">Buy now</a></div>
+                    </div>
+                    <div class="product">
+                        <a href=""><img src="img/1.jpg" width="100%" /></a>
+                        <div class="name"><a href="">Product 1</a></div>
+                        <div class="price">$1000</div>
+                        <div><a href="">Buy now</a></div>
+                    </div>
+                    <div class="product">
+                        <a href=""><img src="img/1.jpg" width="100%" /></a>
+                        <div class="name"><a href="">Product 1</a></div>
+                        <div class="price">$1000</div>
+                        <div><a href="">Buy now</a></div>
+                    </div>
+                </div>
+                <div id="paging">
+                    <div class="pagination">
+                        <a href="#">&laquo;</a>
+                        <a href="#">1</a>
+                        <a href="#" class="active">2</a>
+                        <a href="#">3</a>
+                        <a href="#">4</a>
+                        <a href="#">5</a>
+                        <a href="#">6</a>
+                        <a href="#">&raquo;</a>
+                    </div>
+                </div>-->
+                <div class="path">Best Sale</b></div>
+                <div id="sale-product" class="content-main">
+                </div>
+                <div id="paging">
+                    <div class="pagination">
+                        <a href="#">&laquo;</a>
+                        <a href="#">1</a>
+                        <a href="#" class="active">2</a>
+                        <a href="#">3</a>
+                        <a href="#">4</a>
+                        <a href="#">5</a>
+                        <a href="#">6</a>
+                        <a href="#">&raquo;</a>
+                    </div>
+                </div> 
+                <div class="path">New Product</b></div>
+                <div id="new-product" class="content-main">
+                </div>
+                <div id="paging-new" class="paging">
+                    <div id="pagination-new" class="pagination">
+                        <a href="#">&laquo;</a>
+                        <a href="#">1</a>
+                        <a href="#" class="active">2</a>
+                        <a href="#">3</a>
+                        <a href="#">4</a>
+                        <a href="#">5</a>
+                        <a href="#">6</a>
+                        <a href="#">&raquo;</a>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <div id="footer">footer</div>
+    </div>
+</body>
+<script>
+    getAllCategory();
+    getProducts(0);
+    getProductsBestSale(0);
+    getListPageIndex();
+</script>
+
+</html>
