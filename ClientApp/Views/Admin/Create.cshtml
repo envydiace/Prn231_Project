@@ -1,0 +1,69 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model ProductAdd
+@{
+    ViewData["Title"] = "Create Product";
+    var categories = ViewData["categories"] as IEnumerable<CategoryView>;
+}
+
+<div id="content">
+    <div id="content-left">
+        <ul>
+            <a href="dashboard.html">
+            <li>Dashboard</li></a>
+            <a href="order.html">
+            <li>Orders</li></a>
+            <a href="product.html">
+            <li>Products</li></a>
+            <a href="#">
+            <li>Customers</li></a>
+        </ul>
+    </div>
+    <div id="content-right">
+        <div class="path-admin">CREATE A NEW PRODUCT</b></div>
+        <div class="content-main">
+            <form asp-controller="Admin" asp-action="CreateProduct" id="content-main-product">
+                <div class="content-main-1">
+                    <label>Product name (*):</label><br />
+                    <input asp-for="ProductName" class="form-control" />
+                    <span asp-validation-for="ProductName" class="text-danger"></span>
+                    <br />
+                    <label>Unit price:</label><br />
+                    <input asp-for="UnitPrice" class="form-control" />
+                    <span asp-validation-for="UnitPrice" class="text-danger"></span>
+                    <br />
+                    <label>Quantity per unit:</label><br />
+                    <input asp-for="QuantityPerUnit" class="form-control" />
+                    <span asp-validation-for="QuantityPerUnit" class="text-danger"></span>
+                    <br />
+                    <label>Units in stock (*):</label><br />
+                    <input asp-for="UnitsInStock" class="form-control" />
+                    <span asp-validation-for="UnitsInStock" class="text-danger"></span>
+                    <br />
+                </div>
+                <div class="content-main-1">
+                    <label>Category (*):</label><br />
+                    <select asp-for="CategoryId">
+                        @foreach (var category in categories)
+                        {
+                            <option value="@category.CategoryId">@category.CategoryName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    <br />
+                    <label>Reorder level:</label><br />
+                    <input asp-for="ReorderLevel" class="form-control" />
+                    <span asp-validation-for="ReorderLevel" class="text-danger"></span>
+                    <br />
+                    <label>Units on order:</label><br />
+                    <input type="text" asp-for="UnitsOnOrder" disabled><br />
+                    <label>Discontinued:</label><br />
+                    @Html.CheckBoxFor(p => p.Discontinued)
+                    <br/>
+                    <input type="submit" value="Save" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
