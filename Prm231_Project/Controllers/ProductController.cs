@@ -119,9 +119,9 @@ namespace Prm231_Project.Controllers
             }
         }
 
-        [Authorize(Policy = "AdminOnly")]
+        //[Authorize(Policy = "AdminOnly")]
         [HttpPost("[action]")]
-        public async Task<IActionResult> Create([FromForm] ProductAddDTO product)
+        public async Task<IActionResult> Create(ProductAddDTO product)
         {
             if (ModelState.IsValid)
             {
@@ -162,9 +162,9 @@ namespace Prm231_Project.Controllers
 
         }
 
-        [Authorize(Policy = "AdminOnly")]
+        //[Authorize(Policy = "AdminOnly")]
         [HttpPut("[action]")]
-        public async Task < IActionResult> Update([FromForm] ProductEditDTO product)
+        public async Task < IActionResult> Update(ProductEditDTO product)
         {
             var pro = await _context.Products.Where(e => e.ProductId == product.ProductId).AsNoTracking().FirstOrDefaultAsync();
             if (pro != null)
@@ -188,8 +188,7 @@ namespace Prm231_Project.Controllers
 
         }
 
-        [Authorize(Policy = "AdminOnly")]
-        //[Authorize(Roles = "1")]
+        //[Authorize(Policy = "AdminOnly")]
         [HttpGet("[action]")]
         public async Task<ActionResult<ProductDTO>> GetAllFilter(int categoryId, string? search = null)
         {
