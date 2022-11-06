@@ -6,12 +6,12 @@
     ViewData["Title"] = "Admin Page";
     var categories = ViewData["categories"] as IEnumerable<CategoryView>;
     var products = ViewData["products"] as IEnumerable<ProductView>;
-    var token = ViewData["token"] as string;
-    if (token != null)
+    if (ViewData["token"] != null)
     {
-    <script>
-                window.localStorage.setItem("accessToken",  @token);
-    </script>
+        <script>
+            var storTest = window['localStorage'];
+            storTest.setItem("accessToken",  '@ViewData["token"]');
+        </script>
     }
 }
 

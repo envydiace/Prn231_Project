@@ -4,9 +4,9 @@ namespace ClientApp.Controllers
 {
     public class TestController : Controller
     {
-        public IActionResult Index(string? token)
+        public IActionResult Index()
         {
-            ViewData["token"] = token;
+            ViewData["token"] = HttpContext.Session.GetString("token");
             return View("~/Views/Test.cshtml");
         }
     }

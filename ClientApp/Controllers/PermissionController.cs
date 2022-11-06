@@ -28,7 +28,8 @@ namespace ClientApp.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         string result = await response.Content.ReadAsStringAsync();
-                        return RedirectToAction("Product", "Admin", new { token = result } );
+                        HttpContext.Session.SetString("token", result.Substring(1,result.Length-2));
+                        return RedirectToAction("Product", "Admin");
                     }
                     else
                     {

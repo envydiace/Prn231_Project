@@ -18,18 +18,37 @@ namespace ClientApp.Controllers
                 return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
             }
             ViewData["categories"] = categories;
-            HttpResponseMessage productResponse = await Calculate.callGetApi("Product/GetAllFilter?categoryId=" + searchView.CategoryId + (searchView.Search != null ? ("&search=" + searchView.Search) : ""));
-            if (productResponse.IsSuccessStatusCode)
+
+            using (var Client = new HttpClient())
             {
-                string results = productResponse.Content.ReadAsStringAsync().Result;
-                List<ProductView> products = JsonConvert.DeserializeObject<List<ProductView>>(results);
-                ViewData["products"] = products;
+                Client.BaseAddress = new Uri(baseUrl);
+                Client.DefaultRequestHeaders.Accept.Clear();
+                Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                string token = HttpContext.Session.GetString("token");
+                Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+                HttpResponseMessage productResponse = await Client.GetAsync("Product/GetAllFilter?categoryId=" + searchView.CategoryId + (searchView.Search != null ? ("&search=" + searchView.Search) : ""));
+                
+                if (productResponse.IsSuccessStatusCode)
+                {
+                    string results = productResponse.Content.ReadAsStringAsync().Result;
+                    List<ProductView> products = JsonConvert.DeserializeObject<List<ProductView>>(results);
+                    ViewData["products"] = products;
+                }
+                else if (productResponse.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
+                {
+                    return RedirectToAction("Login","Permission");
+                }
+                else if (productResponse.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                }
             }
-            else
-            {
-                Console.WriteLine("Error Calling web API");
-                return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-            }
+
+            ViewData["token"] = HttpContext.Session.GetString("token");
             return View("~/Views/Admin/Index.cshtml");
         }
 
@@ -64,6 +83,8 @@ namespace ClientApp.Controllers
                     Client.BaseAddress = new Uri(baseUrl);
                     Client.DefaultRequestHeaders.Accept.Clear();
                     Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    string token = HttpContext.Session.GetString("token");
+                    Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
                     HttpResponseMessage response = await Client.PostAsJsonAsync("Product/Create", product);
                     if (response.IsSuccessStatusCode)
                     {
@@ -71,7 +92,11 @@ namespace ClientApp.Controllers
                     }
                     else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
                     {
-                        return View("~/Views/Home/Index.cshtml");
+                        return RedirectToAction("Login", "Permission");
+                    }
+                    else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
+                    {
+                        return RedirectToAction("Index", "Home");
                     }
                     else
                     {
@@ -100,6 +125,8 @@ namespace ClientApp.Controllers
                     Client.BaseAddress = new Uri(baseUrl);
                     Client.DefaultRequestHeaders.Accept.Clear();
                     Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    string token = HttpContext.Session.GetString("token");
+                    Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
                     HttpResponseMessage response = await Client.PutAsJsonAsync("Product/Update", product);
                     if (response.IsSuccessStatusCode)
                     {
@@ -134,7 +161,8 @@ namespace ClientApp.Controllers
                 Client.BaseAddress = new Uri(baseUrl);
                 Client.DefaultRequestHeaders.Accept.Clear();
                 Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                //Client.DefaultRequestHeaders.Add("Authentication", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJKV1RTZXJ2aWNlQWNjZXNzVG9rZW4iLCJqdGkiOiI3NzVlOGRkYy00ZGU4LTRkODMtOThmNi0wOWM3NTA3ZDExNDkiLCJpYXQiOiIxMS8yLzIwMjIgMzo0NDoyNSBQTSIsIkFjY291bnRJZCI6IjMiLCJQYXNzd29yZCI6WyIxMjMiLCIxMjMiXSwiRW1haWwiOiJlbXAxQGZwdC5lZHUudm4iLCJDdXN0b21lcklkIjoiIiwiRW1wbG95ZWVJZCI6IjUiLCJSb2xlIjoiMSIsImV4cCI6MTY2NzQwMzg3NSwiaXNzIjoiSldUQXV0aGVudGljYXRpb25TZXJ2ZXIiLCJhdWQiOiJKV1RTZXJ2aWNlUG9zdG1hbkNsaWVudCJ9.AF31xHPcjcci6mh5FGbKLTzzSd6S7ug-9hnPVoB-2jQ");
+                string token = HttpContext.Session.GetString("token");
+                Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
                 HttpResponseMessage response = await Client.DeleteAsync($"Product/Delete/{id}");
                 if (response.IsSuccessStatusCode)
                 {
@@ -142,7 +170,11 @@ namespace ClientApp.Controllers
                 }
                 else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
                 {
-                    return View("~/Views/Home/Index.cshtml");
+                    return RedirectToAction("Login", "Permission");
+                }
+                else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
+                {
+                    return RedirectToAction("Index", "Home");
                 }
                 else
                 {
@@ -150,7 +182,7 @@ namespace ClientApp.Controllers
                 }
             }
         }
-        
+
 
         private async Task<ProductEdit> GetProductById(int id)
         {
@@ -166,6 +198,6 @@ namespace ClientApp.Controllers
                 return null;
             }
         }
-        
+
     }
 }

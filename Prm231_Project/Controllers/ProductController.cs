@@ -59,7 +59,7 @@ namespace Prm231_Project.Controllers
             });
         }
         [HttpGet("[action]")]
-        public async Task< ActionResult<PagingProductDTO>> GetProductHot(int categoryId = 0, int pageIndex = 1, int pageSize = 4)
+        public async Task<ActionResult<PagingProductDTO>> GetProductHot(int categoryId = 0, int pageIndex = 1, int pageSize = 4)
         {
             var list = await _context.Products.Where(p => categoryId == 0 || p.CategoryId == categoryId).Include(p => p.Category)
                 .Include(p => p.OrderDetails)
@@ -119,7 +119,7 @@ namespace Prm231_Project.Controllers
             }
         }
 
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost("[action]")]
         public async Task<IActionResult> Create(ProductAddDTO product)
         {
@@ -136,9 +136,9 @@ namespace Prm231_Project.Controllers
             }
         }
 
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete("[action]/{id}")]
-        public async Task< ActionResult<string>> Delete(int id)
+        public async Task<ActionResult<string>> Delete(int id)
         {
             try
             {
@@ -162,9 +162,9 @@ namespace Prm231_Project.Controllers
 
         }
 
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpPut("[action]")]
-        public async Task < IActionResult> Update(ProductEditDTO product)
+        public async Task<IActionResult> Update(ProductEditDTO product)
         {
             var pro = await _context.Products.Where(e => e.ProductId == product.ProductId).AsNoTracking().FirstOrDefaultAsync();
             if (pro != null)
@@ -188,7 +188,7 @@ namespace Prm231_Project.Controllers
 
         }
 
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpGet("[action]")]
         public async Task<ActionResult<ProductDTO>> GetAllFilter(int categoryId, string? search = null)
         {
