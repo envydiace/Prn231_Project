@@ -1,18 +1,25 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
     var categories = ViewData["categories"] as IEnumerable<CategoryView>;
-    var productsHot =  ViewData["productsHot"] as ProductPagingView;
+    var productsBestSale = ViewData["productsBestSale"] as ProductPagingView;
+    var productsHot = ViewData["productsHot"] as ProductPagingView;
+    var productsNew = ViewData["productsNew"] as ProductPagingView;
+    int categoryId = ViewData["categoryId"] != null ? Convert.ToInt32(ViewData["categoryId"]) : 1;
+    int pageHot = ViewData["pageHot"] != null ? Convert.ToInt32(ViewData["pageHot"]) : 1;
+    int pageSale = ViewData["pageSale"] != null ? Convert.ToInt32(ViewData["pageSale"]) : 1;
+    int pageNew = ViewData["pageNew"] != null ? Convert.ToInt32(ViewData["pageNew"]) : 1;
 }
+@model HomeFilterView
 
 <div id="content">
     <div id="content-left">
         <h3>CATEGORY</h3>
         <ul>
-            <a href="#">
-                <li>All</li></a>
+            <a asp-controller="Home" asp-action="Filter" asp-route-id="0">
+            <li>All</li></a>
             @foreach (var cate in categories)
             {
-                <a href="#">
+                <a asp-controller="Home" asp-action="Filter" asp-route-id="@cate.CategoryId">
                 <li>@cate.CategoryName</li></a>
             }
         </ul>
@@ -20,68 +27,123 @@
     <div id="content-right">
         <div class="path">Hot</b></div>
         <div class="content-main">
-            @foreach(var pHot in productsHot.Values)
+            @foreach (var pHot in productsHot.Values)
             {
                 <div class="product">
-                <a href="detail.html"><img src="img/1.jpg" width="100%" /></a>
-                <div class="name"><a href="detail.html">@pHot.ProductName</a></div>
-                <div class="price">$@pHot.UnitPrice</div>
-                <div><a href="">Buy now</a></div>
-            </div>
+                    <a href="detail.html"><img src="~/img/1.jpg" width="100%" /></a>
+                    <div class="name"><a href="detail.html">@pHot.ProductName</a></div>
+                    <div class="price">$@pHot.UnitPrice</div>
+                    <div><a href="">Buy now</a></div>
+                </div>
             }
+
+        </div>
+        <div id="paging">
+            <div class="pagination">
+                <a class="@(pageHot==1?"visually-hidden":"")"
+                   asp-action="Filter"
+                   asp-controller="Home"
+                   asp-route-id="@categoryId"
+                   asp-route-pageHot="@(pageHot-1)"
+                   asp-route-pageSale="@pageSale"
+                   asp-route-pageNew="@pageNew">&laquo;</a>
+                @for (int i = 1; i <= productsHot.TotalPages; i++)
+                {
+                    <a asp-action="Filter"
+                   asp-controller="Home"
+                   asp-route-id="@categoryId"
+                   asp-route-pageHot="@i"
+                   asp-route-pageSale="@pageSale"
+                   asp-route-pageNew="@pageNew"
+                   class="@(i==pageHot?"active":"")">@i</a>
+                }
+                <a class="@(pageHot==productsHot.TotalPages?"visually-hidden":"")"
+                   asp-action="Filter"
+                   asp-controller="Home"
+                   asp-route-id="@categoryId"
+                   asp-route-pageHot="@(pageHot+1)"
+                   asp-route-pageSale="@pageSale"
+                   asp-route-pageNew="@pageNew">&raquo;</a>
+            </div>
         </div>
         <div class="path">Best Sale</b></div>
         <div class="content-main">
-            <div class="product">
-                <a href="detail.html"><img src="img/1.jpg" width="100%" /></a>
-                <div class="name"><a href="detail.html">Product 1</a></div>
-                <div class="price">$1000</div>
-                <div><a href="">Buy now</a></div>
-            </div>
-            <div class="product">
-                <a href=""><img src="img/1.jpg" width="100%" /></a>
-                <div class="name"><a href="">Product 1</a></div>
-                <div class="price">$1000</div>
-                <div><a href="">Buy now</a></div>
-            </div>
-            <div class="product">
-                <a href=""><img src="img/1.jpg" width="100%" /></a>
-                <div class="name"><a href="">Product 1</a></div>
-                <div class="price">$1000</div>
-                <div><a href="">Buy now</a></div>
-            </div>
-            <div class="product">
-                <a href=""><img src="img/1.jpg" width="100%" /></a>
-                <div class="name"><a href="">Product 1</a></div>
-                <div class="price">$1000</div>
-                <div><a href="">Buy now</a></div>
+            @foreach (var pSale in productsBestSale.Values)
+            {
+                <div class="product">
+                    <a href="detail.html"><img src="~/img/1.jpg" width="100%" /></a>
+                    <div class="name"><a href="detail.html">@pSale.ProductName</a></div>
+                    <div class="price">$@pSale.UnitPrice</div>
+                    <div><a href="">Buy now</a></div>
+                </div>
+            }
+        </div>
+        <div id="paging">
+            <div class="pagination">
+                <a class="@(pageSale==1?"visually-hidden":"")"
+                   asp-action="Filter"
+                   asp-controller="Home"
+                   asp-route-id="@categoryId"
+                   asp-route-pageSale="@(pageSale-1)"
+                   asp-route-pageHot="@pageHot"
+                   asp-route-pageNew="@pageNew">&laquo;</a>
+                @for (int i = 1; i <= productsBestSale.TotalPages; i++)
+                {
+                    <a asp-action="Filter"
+                   asp-controller="Home"
+                   asp-route-id="@categoryId"
+                   asp-route-pageSale="@i"
+                   asp-route-pageHot="@pageHot"
+                   asp-route-pageNew="@pageNew"
+                   class="@(i==pageSale?"active":"")">@i</a>
+                }
+                <a class="@(pageSale==productsBestSale.TotalPages?"visually-hidden":"")"
+                   asp-action="Filter"
+                   asp-controller="Home"
+                   asp-route-id="@categoryId"
+                   asp-route-pageSale="@(pageSale+1)"
+                   asp-route-pageHot="@pageHot"
+                   asp-route-pageNew="@pageNew">&raquo;</a>
             </div>
         </div>
         <div class="path">New Product</b></div>
         <div class="content-main">
-            <div class="product">
-                <a href="detail.html"><img src="img/1.jpg" width="100%" /></a>
-                <div class="name"><a href="detail.html">Product 1</a></div>
-                <div class="price">$1000</div>
-                <div><a href="">Buy now</a></div>
-            </div>
-            <div class="product">
-                <a href=""><img src="img/1.jpg" width="100%" /></a>
-                <div class="name"><a href="">Product 1</a></div>
-                <div class="price">$1000</div>
-                <div><a href="">Buy now</a></div>
-            </div>
-            <div class="product">
-                <a href=""><img src="img/1.jpg" width="100%" /></a>
-                <div class="name"><a href="">Product 1</a></div>
-                <div class="price">$1000</div>
-                <div><a href="">Buy now</a></div>
-            </div>
-            <div class="product">
-                <a href=""><img src="img/1.jpg" width="100%" /></a>
-                <div class="name"><a href="">Product 1</a></div>
-                <div class="price">$1000</div>
-                <div><a href="">Buy now</a></div>
+            @foreach (var pNew in productsNew.Values)
+            {
+                <div class="product">
+                    <a href="detail.html"><img src="~/img/1.jpg" width="100%" /></a>
+                    <div class="name"><a href="detail.html">@pNew.ProductName</a></div>
+                    <div class="price">$@pNew.UnitPrice</div>
+                    <div><a href="">Buy now</a></div>
+                </div>
+            }
+        </div>
+        <div id="paging">
+            <div class="pagination">
+                <a class="@(pageNew==1?"visually-hidden":"")"
+                   asp-action="Filter"
+                   asp-controller="Home"
+                   asp-route-id="@categoryId"
+                   asp-route-pageSale="@pageSale"
+                   asp-route-pageHot="@pageHot"
+                   asp-route-pageNew="@(pageNew-1)">&laquo;</a>
+                @for (int i = 1; i <= productsNew.TotalPages; i++)
+                {
+                    <a asp-action="Filter"
+                   asp-controller="Home"
+                   asp-route-id="@categoryId"
+                   asp-route-pageSale="@pageSale"
+                   asp-route-pageHot="@pageHot"
+                   asp-route-pageNew="@i"
+                   class="@(i==pageNew?"active":"")">@i</a>
+                }
+                <a class="@(pageNew==productsNew.TotalPages?"visually-hidden":"")"
+                   asp-action="Filter"
+                   asp-controller="Home"
+                   asp-route-id="@categoryId"
+                   asp-route-pageSale="@pageSale"
+                   asp-route-pageHot="@pageHot"
+                   asp-route-pageNew="@(pageNew+1)">&raquo;</a>
             </div>
         </div>
     </div>
