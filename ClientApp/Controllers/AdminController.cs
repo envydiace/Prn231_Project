@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using ClientApp.Models;
 using Newtonsoft.Json;
@@ -11,33 +10,15 @@ namespace ClientApp.Controllers
     public class AdminController : Controller
     {
         public string baseUrl = "http://localhost:5000/api/";
-        public async Task<ActionResult> Product()
+        public async Task<ActionResult> Product(ProductSearchView? searchView)
         {
-            //using (var Client = new HttpClient())
-            //{
-            //    Client.BaseAddress = new Uri(baseUrl);
-            //    Client.DefaultRequestHeaders.Accept.Clear();
-            //    Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            //    HttpResponseMessage categoryResponse = await Client.GetAsync("Category/GetAll");
-            //    if (categoryResponse.IsSuccessStatusCode)
-            //    {
-            //        string results = categoryResponse.Content.ReadAsStringAsync().Result;
-            //        List<Category> categories = JsonConvert.DeserializeObject<List<Category>>(results);
-            //        ViewData["categories"] = categories;
-            //    }
-            //    else
-            //    {
-            //        Console.WriteLine("Error Calling web API");
-            //    }
-            //}
-            var categories = await GetAllCategory();
+            var categories = await Calculate.GetAllCategory();
             if (categories == null)
             {
                 return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
             }
             ViewData["categories"] = categories;
-
-            HttpResponseMessage productResponse = await Calculate.callApi("Product/GetAllFilter");
+            HttpResponseMessage productResponse = await Calculate.callGetApi("Product/GetAllFilter?categoryId=" + searchView.CategoryId + (searchView.Search != null ? ("&search=" + searchView.Search) : ""));
             if (productResponse.IsSuccessStatusCode)
             {
                 string results = productResponse.Content.ReadAsStringAsync().Result;
@@ -49,13 +30,12 @@ namespace ClientApp.Controllers
                 Console.WriteLine("Error Calling web API");
                 return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
             }
-
             return View("~/Views/Admin/Index.cshtml");
         }
 
         public async Task<ActionResult> Create()
         {
-            var categories = await GetAllCategory();
+            var categories = await Calculate.GetAllCategory();
             if (categories == null)
             {
                 return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
@@ -66,7 +46,7 @@ namespace ClientApp.Controllers
 
         public async Task<ActionResult> Update(int id)
         {
-            var categories = await GetAllCategory();
+            var categories = await Calculate.GetAllCategory();
             if (categories == null)
             {
                 return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
@@ -101,7 +81,7 @@ namespace ClientApp.Controllers
             }
             else
             {
-                var categories = await GetAllCategory();
+                var categories = await Calculate.GetAllCategory();
                 if (categories == null)
                 {
                     return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
@@ -137,7 +117,7 @@ namespace ClientApp.Controllers
             }
             else
             {
-                var categories = await GetAllCategory();
+                var categories = await Calculate.GetAllCategory();
                 if (categories == null)
                 {
                     return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
@@ -170,26 +150,11 @@ namespace ClientApp.Controllers
                 }
             }
         }
-
-
-        private async Task<List<CategoryView>> GetAllCategory()
-        {
-            HttpResponseMessage categoryResponse = await Calculate.callApi("Category/GetAll");
-            if (categoryResponse.IsSuccessStatusCode)
-            {
-                string results = categoryResponse.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject<List<CategoryView>>(results);
-            }
-            else
-            {
-                Console.WriteLine("Error Calling web API");
-                return null;
-            }
-        }
+        
 
         private async Task<ProductEdit> GetProductById(int id)
         {
-            HttpResponseMessage productResponse = await Calculate.callApi($"Product/Get/{id}");
+            HttpResponseMessage productResponse = await Calculate.callGetApi($"Product/Get/{id}");
             if (productResponse.IsSuccessStatusCode)
             {
                 string results = productResponse.Content.ReadAsStringAsync().Result;
@@ -201,81 +166,6 @@ namespace ClientApp.Controllers
                 return null;
             }
         }
-
-
-        // GET: Admin
-        //public ActionResult Index()
-        //{
-        //    return View();
-        //}
-
-        // GET: Admin/Details/5
-        //public ActionResult Details(int id)
-        //{
-        //    return View();
-        //}
-
-        //// GET: Admin/Create
-        //public ActionResult Create()
-        //{
-        //    return View();
-        //}
-
-        //// POST: Admin/Create
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Create(IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-
-        //// GET: Admin/Edit/5
-        //public ActionResult Edit(int id)
-        //{
-        //    return View();
-        //}
-
-        //// POST: Admin/Edit/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Edit(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-
-        //// GET: Admin/Delete/5
-        //public ActionResult Delete(int id)
-        //{
-        //    return View();
-        //}
-
-        //// POST: Admin/Delete/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Delete(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
+        
     }
 }

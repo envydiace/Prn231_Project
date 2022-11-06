@@ -1,20 +1,35 @@
 ﻿using ClientApp.Models;
+using ClientApp.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Diagnostics;
 
 namespace ClientApp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        public string baseUrl = "http://localhost:5000/api/";
 
-        public HomeController(ILogger<HomeController> logger)
+        public async Task<IActionResult> Index()
         {
-            _logger = logger;
-        }
-
-        public IActionResult Index()
-        {
+            var categories = await Calculate.GetAllCategory();
+            if (categories == null)
+            {
+                return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            }
+            ViewData["categories"] = categories;
+            HttpResponseMessage productHotResponse = await Calculate.callGetApi("Product/GetProductBestSale?pageIndex=1&pageSize=4");
+            if (productHotResponse.IsSuccessStatusCode)
+            {
+                string results = productHotResponse.Content.ReadAsStringAsync().Result;
+                ProductPagingView productsHot = JsonConvert.DeserializeObject<ProductPagingView>(results);
+                ViewData["productsHot"] = productsHot;
+            }   
+            else
+            {
+                Console.WriteLine("Error Calling web API");
+                return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            }
             return View();
         }
 

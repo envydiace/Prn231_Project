@@ -1,5 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+    var categories = ViewData["categories"] as IEnumerable<CategoryView>;
+    var productsHot =  ViewData["productsHot"] as ProductPagingView;
 }
 
 <div id="content">
@@ -7,42 +9,26 @@
         <h3>CATEGORY</h3>
         <ul>
             <a href="#">
-            <li>Category 1</li></a>
-            <a href="#">
-            <li>Category 2</li></a>
-            <a href="#">
-            <li>Category 3</li></a>
-            <a href="#">
-            <li>Category 4</li></a>
+                <li>All</li></a>
+            @foreach (var cate in categories)
+            {
+                <a href="#">
+                <li>@cate.CategoryName</li></a>
+            }
         </ul>
     </div>
     <div id="content-right">
         <div class="path">Hot</b></div>
         <div class="content-main">
-            <div class="product">
+            @foreach(var pHot in productsHot.Values)
+            {
+                <div class="product">
                 <a href="detail.html"><img src="img/1.jpg" width="100%" /></a>
-                <div class="name"><a href="detail.html">Product 1</a></div>
-                <div class="price">$1000</div>
+                <div class="name"><a href="detail.html">@pHot.ProductName</a></div>
+                <div class="price">$@pHot.UnitPrice</div>
                 <div><a href="">Buy now</a></div>
             </div>
-            <div class="product">
-                <a href=""><img src="img/1.jpg" width="100%" /></a>
-                <div class="name"><a href="">Product 1</a></div>
-                <div class="price">$1000</div>
-                <div><a href="">Buy now</a></div>
-            </div>
-            <div class="product">
-                <a href=""><img src="img/1.jpg" width="100%" /></a>
-                <div class="name"><a href="">Product 1</a></div>
-                <div class="price">$1000</div>
-                <div><a href="">Buy now</a></div>
-            </div>
-            <div class="product">
-                <a href=""><img src="img/1.jpg" width="100%" /></a>
-                <div class="name"><a href="">Product 1</a></div>
-                <div class="price">$1000</div>
-                <div><a href="">Buy now</a></div>
-            </div>
+            }
         </div>
         <div class="path">Best Sale</b></div>
         <div class="content-main">

@@ -22,7 +22,7 @@ namespace Prm231_Project.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Login([FromForm] LoginDTO _userData)
+        public async Task<IActionResult> Login( LoginDTO _userData)
         {
             if (_userData != null && _userData.Email != null && _userData.Password != null)
             {

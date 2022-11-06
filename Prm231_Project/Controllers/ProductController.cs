@@ -136,7 +136,7 @@ namespace Prm231_Project.Controllers
             }
         }
 
-        [Authorize(Policy = "AdminOnly")]
+        //[Authorize(Policy = "AdminOnly")]
         [HttpDelete("[action]/{id}")]
         public async Task< ActionResult<string>> Delete(int id)
         {

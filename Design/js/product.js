@@ -6,10 +6,13 @@ function getAllCategory() {
             success: function (result, status, xhr) {
                 var select = $("#select-category");
                 for (let ele of result) {
-                    select.append($("<option>", {
-                        value: ele.categoryId,
-                        text: ele.categoryName
-                    }));
+                    select.append($("<option>",
+                        {
+                            value: ele.categoryId,
+                            text: ele.categoryName
+                        }
+                    )
+                    );
                 }
             },
             error: function (xhr, status, error) {
@@ -89,7 +92,6 @@ function getProducts() {
                         window.location.href = 'index.html';
                         break;
                 }
-
             }
         }
     );
