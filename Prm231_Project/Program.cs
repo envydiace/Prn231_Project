@@ -52,6 +52,8 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy =>
                       policy.RequireClaim("Role", "1"));
+    options.AddPolicy("CustOnly", policy =>
+                      policy.RequireClaim("Role", "2"));
 });
 
 builder.Services.AddDistributedMemoryCache();

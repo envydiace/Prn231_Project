@@ -27,7 +27,7 @@ namespace ClientApp.Controllers
                 string token = HttpContext.Session.GetString("token");
                 Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
                 HttpResponseMessage productResponse = await Client.GetAsync("Product/GetAllFilter?categoryId=" + searchView.CategoryId + (searchView.Search != null ? ("&search=" + searchView.Search) : ""));
-                
+
                 if (productResponse.IsSuccessStatusCode)
                 {
                     string results = productResponse.Content.ReadAsStringAsync().Result;
@@ -36,7 +36,7 @@ namespace ClientApp.Controllers
                 }
                 else if (productResponse.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
                 {
-                    return RedirectToAction("Login","Permission");
+                    return RedirectToAction("Login", "Permission");
                 }
                 else if (productResponse.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
                 {
@@ -78,12 +78,12 @@ namespace ClientApp.Controllers
         {
             if (ModelState.IsValid)
             {
+                string token = HttpContext.Session.GetString("token");
                 using (var Client = new HttpClient())
                 {
                     Client.BaseAddress = new Uri(baseUrl);
                     Client.DefaultRequestHeaders.Accept.Clear();
                     Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    string token = HttpContext.Session.GetString("token");
                     Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
                     HttpResponseMessage response = await Client.PostAsJsonAsync("Product/Create", product);
                     if (response.IsSuccessStatusCode)
@@ -175,6 +175,83 @@ namespace ClientApp.Controllers
                 else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
                 {
                     return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                }
+            }
+        }
+        public async Task<ActionResult> Order(OrderSearchView searchView)
+        {
+            string param = "";
+            if (searchView.From != null)
+            {
+                param += "&from=" + DateTime.Parse(searchView.From.ToString()).ToString("yyyy-MM-dd");
+            }
+            if (searchView.To != null)
+            {
+                param += "&to=" + DateTime.Parse(searchView.To.ToString()).ToString("yyyy-MM-dd");
+            }
+            using (var Client = new HttpClient())
+            {
+                Client.BaseAddress = new Uri(baseUrl);
+                Client.DefaultRequestHeaders.Accept.Clear();
+                Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                string token = HttpContext.Session.GetString("token");
+                Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+                HttpResponseMessage response = await Client.GetAsync("Order/GetAllOrders?pageIndex=" + searchView.page + "&pageSize=20" + param);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string results = response.Content.ReadAsStringAsync().Result;
+                    OrderPagingView orders = JsonConvert.DeserializeObject<OrderPagingView>(results);
+                    ViewData["orders"] = orders;
+                }
+                else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
+                else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
+                else
+                {
+                    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                }
+            }
+            return View();
+        }
+
+        public IActionResult Filter(OrderSearchView filter)
+        {
+
+            return RedirectToAction(nameof(Order), filter);
+        }
+
+        public async Task<ActionResult> CancelOrder(int id)
+        {
+            using (var Client = new HttpClient())
+            {
+                Client.BaseAddress = new Uri(baseUrl);
+                Client.DefaultRequestHeaders.Accept.Clear();
+                Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                string token = HttpContext.Session.GetString("token");
+                Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+                HttpResponseMessage response = await Client.PutAsJsonAsync("Order/CancelOrder?orderId=" + id,id ) ;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction(nameof(Order));
+                }
+                else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
+                else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
+                {
+                    return RedirectToAction("Login", "Permission");
                 }
                 else
                 {

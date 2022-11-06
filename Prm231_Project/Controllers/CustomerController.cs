@@ -31,14 +31,14 @@ namespace Prm231_Project.Controllers
         }
 
         [HttpGet("[action]")]
-        [Authorize]
-        public async Task< ActionResult<Customer>> GetCustomer()
+        [Authorize(Policy = "CustOnly")]
+        public async Task< ActionResult<CustomerDTO>> GetCustomer()
         {
             var CustomerId = GetCustomerID();
             var customer = await _context.Customers.Include(c => c.Accounts).Where(c => c.CustomerId.Equals(CustomerId)).FirstOrDefaultAsync();
             return Ok(mapper.Map<CustomerDTO>(customer));
         }
-        [Authorize]
+        [Authorize(Policy = "CustOnly")]
         [HttpPut("[action]")]
         public async Task<IActionResult> EditCustomerInfo([FromForm] CustomerEditDTO customerDTO)
         {

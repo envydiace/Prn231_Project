@@ -1,0 +1,45 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Profile";
+    var info = ViewData["customerInfo"] as CustomerInfoView;
+}
+<div id="content">
+    <div id="content-left">
+        <h3 style="font-weight: normal;">Welcome, @info.ContactName</h3>
+        <h3>Account Management</h3>
+        <ul>
+            <a asp-action="Info" asp-controller="Customer">
+            <li>Personal information</li></a>
+        </ul>
+        <h3>My order</h3>
+        <ul>
+            <a asp-action="Order" asp-controller="Customer">
+            <li>All orders</li></a>
+            <a asp-action="OrderCanceled" asp-controller="Customer">
+            <li>Canceled order</li></a>
+        </ul>
+    </div>
+    <div id="content-right">
+        <div class="path">Personal information</b></div>
+        <div class="content-main">
+            <div id="profile-content">
+                <div class="profile-content-col">
+                    <div>Company name: <br />@info.CompanyName</div>
+                    <div>Contact name: <br />@info.ContactName</div>
+                    <div>
+                        <a  asp-action="Index" asp-controller="Test" class="btn" > Edit Info</a>
+                    </div>
+                </div>
+                <div class="profile-content-col">
+                    <div>Company title: <br />@info.ContactTitle</div>
+                    <div>Address: <br />@info.Address</div>
+                </div>
+                <div class="profile-content-col">
+                    <div>Email: <br />@info.Email</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

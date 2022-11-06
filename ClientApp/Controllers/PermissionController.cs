@@ -9,8 +9,10 @@ namespace ClientApp.Controllers
     {
         public IActionResult Login()
         {
+            HttpContext.Session.Clear();
             return View("~/Views/Login.cshtml");
         }
+
         public async Task<ActionResult> LoginAccount(LoginView loginView)
         {
             if (!ModelState.IsValid)
@@ -39,6 +41,10 @@ namespace ClientApp.Controllers
                    
             }
            
+        }
+        public IActionResult Register()
+        {
+            return View("~/Views/Register.cshtml");
         }
     }
 }

@@ -18,6 +18,16 @@ namespace Prm231_Project.DTO
                     first => first.OrderDetails
                     ));
 
+            CreateMap<Order, OrderAdminDTO>()
+                .ForMember(second => second.EmployeeName,
+                map => map.MapFrom(
+                    first => first.Employee.LastName
+                    ))
+                .ForMember(second => second.CustomerName,
+                map => map.MapFrom(
+                    first => first.Customer.ContactName
+                    ));
+
             CreateMap<OrderDetail, CartItemDTO>()
                 .ForMember(second => second.ProductID,
                 map => map.MapFrom(

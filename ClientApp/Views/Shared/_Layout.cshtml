@@ -19,9 +19,9 @@
                 <ul>
                     <li><a href="cart.html">Cart: 0</a></li>
                     <li><a asp-controller="Permission" asp-action="Login">SignIn</a></li>
-                    <li><a href="signup.html">SignUp</a></li>
-                    <li><a href="profile.html">Profile</a></li>
-                    <li><a href="#">SignOut</a></li>
+                    <li><a asp-action="Register" asp-controller="Permission">SignUp</a></li>
+                    <li><a asp-action="Info" asp-controller="Customer">Profile</a></li>
+                    <li><a asp-controller="Permission" asp-action="Login">SignOut</a></li>
                 </ul>
             </div>
         </div>

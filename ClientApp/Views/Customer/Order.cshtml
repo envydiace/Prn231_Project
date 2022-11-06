@@ -1,0 +1,68 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Profile";
+    var orders = ViewData["orders"] as IEnumerable<OrderView>;
+}
+
+<div id="content">
+    <div id="content-left">
+        <h3 style="font-weight: normal;">Welcome</h3>
+        <h3>Account Management</h3>
+        <ul>
+            <a asp-action="Info" asp-controller="Customer">
+            <li>Personal information</li></a>
+        </ul>
+        <h3>My order</h3>
+        <ul>
+            <a asp-action="Order" asp-controller="Customer">
+            <li>All orders</li></a>
+            <a asp-action="OrderCanceled" asp-controller="Customer">
+            <li>Canceled order</li></a>
+        </ul>
+    </div>
+    <div id="content-right">
+        <div class="path">LIST ORDERS</b></div>
+        <div class="content-main">
+            <div id="profile-content-order">
+                @foreach (var order in orders)
+                {
+                    <div>
+                        <div class="profile-order-title">
+                            <div class="profile-order-title-left">
+                                <div>Order creation date: @order.OrderDate</div>
+                                <div>Order: <a href="#">#@order.OrderId</a></div>
+                            </div>
+                            <div class="profile-order-title-right">
+                                @if(order.RequiredDate==null)
+                                {
+                                    <span>Canceled</span>
+                                }
+                                else if (order.ShippedDate == null)
+                                {
+                                    <span>Pending</span>
+                                }
+                                else
+                                {
+                                    <span style="color: blue;">Completed</span>
+                                }
+                            </div>
+                        </div>
+                        @foreach (var item in order.OrderDetails)
+                        {
+                            <div class="profile-order-content">
+                                <div class="profile-order-content-col1">
+                                    <a asp-action="ProductDetail" asp-route-id="@item.ProductID" asp-controller="Home"><img src="~/img/2.jpg" width="100%" /></a>
+                                </div>
+                                <div class="profile-order-content-col2">@item.ProductName</div>
+                                <div class="profile-order-content-col3">Quantity: @item.Quantity</div>
+                                <div class="profile-order-content-col4">@item.UnitPrice $</div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
