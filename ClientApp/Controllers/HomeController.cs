@@ -70,6 +70,23 @@ namespace ClientApp.Controllers
             return RedirectToAction("Index", "Home", homeFilterView);
         }
 
+        public async Task< IActionResult >ProductDetail(int id)
+        {
+            HttpResponseMessage response = await Calculate.callGetApi($"Product/Get/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                string results = response.Content.ReadAsStringAsync().Result;
+                ProductView product = JsonConvert.DeserializeObject<ProductView>(results);
+                ViewData["product"] = product;
+            }
+            else
+            {
+                Console.WriteLine("Error Calling web API");
+                return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            }
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

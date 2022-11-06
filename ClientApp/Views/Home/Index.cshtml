@@ -30,8 +30,8 @@
             @foreach (var pHot in productsHot.Values)
             {
                 <div class="product">
-                    <a href="detail.html"><img src="~/img/1.jpg" width="100%" /></a>
-                    <div class="name"><a href="detail.html">@pHot.ProductName</a></div>
+                    <a asp-action="ProductDetail" asp-route-id="@pHot.ProductId" asp-controller="Home" ><img src="~/img/1.jpg" width="100%" /></a>
+                    <div class="name"><a asp-action="ProductDetail" asp-route-id="@pHot.ProductId" asp-controller="Home" >@pHot.ProductName</a></div>
                     <div class="price">$@pHot.UnitPrice</div>
                     <div><a href="">Buy now</a></div>
                 </div>
@@ -71,8 +71,8 @@
             @foreach (var pSale in productsBestSale.Values)
             {
                 <div class="product">
-                    <a href="detail.html"><img src="~/img/1.jpg" width="100%" /></a>
-                    <div class="name"><a href="detail.html">@pSale.ProductName</a></div>
+                    <a asp-action="ProductDetail" asp-route-id="@pSale.ProductId" asp-controller="Home" ><img src="~/img/1.jpg" width="100%" /></a>
+                    <div class="name"><a asp-action="ProductDetail" asp-route-id="@pSale.ProductId" asp-controller="Home" >@pSale.ProductName</a></div>
                     <div class="price">$@pSale.UnitPrice</div>
                     <div><a href="">Buy now</a></div>
                 </div>
@@ -111,8 +111,8 @@
             @foreach (var pNew in productsNew.Values)
             {
                 <div class="product">
-                    <a href="detail.html"><img src="~/img/1.jpg" width="100%" /></a>
-                    <div class="name"><a href="detail.html">@pNew.ProductName</a></div>
+                    <a asp-action="ProductDetail" asp-route-id="@pNew.ProductId" asp-controller="Home" ><img src="~/img/1.jpg" width="100%" /></a>
+                    <div class="name"><a asp-action="ProductDetail" asp-route-id="@pNew.ProductId" asp-controller="Home" >@pNew.ProductName</a></div>
                     <div class="price">$@pNew.UnitPrice</div>
                     <div><a href="">Buy now</a></div>
                 </div>
