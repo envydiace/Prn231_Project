@@ -49,6 +49,34 @@ namespace ClientApp.Controllers
             return View("~/Views/Register.cshtml");
         }
 
+        public async Task<ActionResult> RegistAccount(RegisterView registerView)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("~/Views/Register.cshtml");
+            }
+            else
+            {
+               
+                using (var Client = new HttpClient())
+                {
+                    Client.BaseAddress = new Uri("http://localhost:5000/api/");
+                    Client.DefaultRequestHeaders.Accept.Clear();
+                    Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    HttpResponseMessage response = await Client.PostAsJsonAsync("Register", registerView);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction("Login", "Permission");
+                    }
+                    else
+                    {
+                        return RedirectToAction("Login", "Permission");
+                    }
+                }
+            }
+        }
+
+
         public IActionResult ForgotPass()
         {
             return View("~/Views/ForgotPass.cshtml");
