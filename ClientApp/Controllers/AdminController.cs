@@ -15,7 +15,7 @@ namespace ClientApp.Controllers
             var categories = await Calculate.GetAllCategory();
             if (categories == null)
             {
-                return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                return RedirectToAction("Login", "Permission");
             }
             ViewData["categories"] = categories;
 
@@ -46,7 +46,7 @@ namespace ClientApp.Controllers
                 }
                 else
                 {
-                    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                    return RedirectToAction("Login", "Permission");
                 }
             }
 
@@ -59,7 +59,7 @@ namespace ClientApp.Controllers
             var categories = await Calculate.GetAllCategory();
             if (categories == null)
             {
-                return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                return RedirectToAction("Login", "Permission");
             }
             ViewData["categories"] = categories;
             return View("~/Views/Admin/Create.cshtml");
@@ -70,7 +70,7 @@ namespace ClientApp.Controllers
             var categories = await Calculate.GetAllCategory();
             if (categories == null)
             {
-                return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                return RedirectToAction("Login", "Permission");
             }
             ViewData["categories"] = categories;
             return View("~/Views/Admin/Update.cshtml", await GetProductById(id));
@@ -102,7 +102,7 @@ namespace ClientApp.Controllers
                     }
                     else
                     {
-                        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                        return RedirectToAction("Login", "Permission");
                     }
                 }
             }
@@ -111,7 +111,7 @@ namespace ClientApp.Controllers
                 var categories = await Calculate.GetAllCategory();
                 if (categories == null)
                 {
-                    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                    return RedirectToAction("Login", "Permission");
                 }
                 ViewData["categories"] = categories;
                 return View("~/Views/Admin/Create.cshtml");
@@ -140,7 +140,7 @@ namespace ClientApp.Controllers
                     }
                     else
                     {
-                        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                        return RedirectToAction("Login", "Permission");
                     }
                 }
             }
@@ -149,7 +149,7 @@ namespace ClientApp.Controllers
                 var categories = await Calculate.GetAllCategory();
                 if (categories == null)
                 {
-                    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                    return RedirectToAction("Login", "Permission");
                 }
                 ViewData["categories"] = categories;
                 return View("~/Views/Admin/Update.cshtml");
@@ -180,7 +180,7 @@ namespace ClientApp.Controllers
                 }
                 else
                 {
-                    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                    return RedirectToAction("Login", "Permission");
                 }
             }
         }
@@ -220,7 +220,7 @@ namespace ClientApp.Controllers
                 }
                 else
                 {
-                    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                    return RedirectToAction("Login", "Permission");
                 }
             }
             return View();
@@ -241,7 +241,7 @@ namespace ClientApp.Controllers
                 Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 string token = HttpContext.Session.GetString("token");
                 Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
-                HttpResponseMessage response = await Client.PutAsJsonAsync("Order/CancelOrder?orderId=" + id,id ) ;
+                HttpResponseMessage response = await Client.PutAsJsonAsync("Order/CancelOrder?orderId=" + id, id);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -257,7 +257,7 @@ namespace ClientApp.Controllers
                 }
                 else
                 {
-                    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                    return RedirectToAction("Login", "Permission");
                 }
             }
         }

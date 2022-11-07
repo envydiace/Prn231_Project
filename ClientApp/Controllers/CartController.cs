@@ -28,17 +28,9 @@ namespace ClientApp.Controllers
                         CustomerInfoView cus = JsonConvert.DeserializeObject<CustomerInfoView>(results);
                         ViewData["customerInfo"] = cus;
                     }
-                    else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
-                    {
-                        return RedirectToAction("Login", "Permission");
-                    }
-                    else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
-                    {
-                        return RedirectToAction("Login", "Permission");
-                    }
                     else
                     {
-                        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                        return RedirectToAction("Login", "Permission");
                     }
                 }
             }
@@ -95,8 +87,7 @@ namespace ClientApp.Controllers
                 }
                 else
                 {
-                    Console.WriteLine("Error Calling web API");
-                    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                    return RedirectToAction("Login", "Permission");
                 }
             }
             else

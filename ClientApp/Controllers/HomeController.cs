@@ -15,7 +15,7 @@ namespace ClientApp.Controllers
             var categories = await Calculate.GetAllCategory();
             if (categories == null)
             {
-                return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                return RedirectToAction("Login", "Permission");
             }
             ViewData["categories"] = categories;
             HttpResponseMessage productHotResponse = await Calculate.callGetApi("Product/GetProductHot?categoryId=" + filter.CategoryId + "&pageIndex=" + filter.pageHot + "&pageSize=4");
@@ -27,8 +27,7 @@ namespace ClientApp.Controllers
             }
             else
             {
-                Console.WriteLine("Error Calling web API");
-                return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                return RedirectToAction("Login", "Permission");
             }
             HttpResponseMessage productsBestSaleResponse = await Calculate.callGetApi("Product/GetProductBestSale?categoryId=" + filter.CategoryId + "&pageIndex=" + filter.pageSale + "&pageSize=4");
             if (productsBestSaleResponse.IsSuccessStatusCode)
@@ -39,8 +38,7 @@ namespace ClientApp.Controllers
             }
             else
             {
-                Console.WriteLine("Error Calling web API");
-                return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                return RedirectToAction("Login", "Permission");
             }
 
 
@@ -54,8 +52,7 @@ namespace ClientApp.Controllers
             }
             else
             {
-                Console.WriteLine("Error Calling web API");
-                return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                return RedirectToAction("Login", "Permission");
             }
             ViewData["categoryId"] = filter.CategoryId;
             ViewData["pageHot"] = filter.pageHot;
@@ -81,8 +78,7 @@ namespace ClientApp.Controllers
             }
             else
             {
-                Console.WriteLine("Error Calling web API");
-                return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                return RedirectToAction("Login", "Permission");
             }
             return View();
         }
