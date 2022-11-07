@@ -6,6 +6,11 @@ using Prm231_Project.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using MimeKit;
+using MimeKit.Text;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using Prm231_Project.Utils.Mail;
 
 namespace Prm231_Project.Controllers
 {
@@ -15,14 +20,16 @@ namespace Prm231_Project.Controllers
     {
         public PRN231DBContext _context;
         public IConfiguration _configuration;
-        public PermissionController(PRN231DBContext context, IConfiguration configuration)
+        private readonly IEmailService _emailService;
+        public PermissionController(PRN231DBContext context, IConfiguration configuration, IEmailService emailService)
         {
             _context = context;
             _configuration = configuration;
+            _emailService = emailService;
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Login( LoginDTO _userData)
+        public async Task<IActionResult> Login(LoginDTO _userData)
         {
             if (_userData != null && _userData.Email != null && _userData.Password != null)
             {
@@ -144,8 +151,38 @@ namespace Prm231_Project.Controllers
             var AccountId = jwt.Claims.First(claim => claim.Type == "AccountId").Value;
             var Role = jwt.Claims.First(claim => claim.Type == "Role").Value;
             var Email = jwt.Claims.First(claim => claim.Type == "Email").Value;
-            return Ok(new { CustomerId, EmployeeId, AccountId, Role, Email});
+            return Ok(new { CustomerId, EmployeeId, AccountId, Role, Email });
         }
-        
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            string newPass = "abcde@123";
+            Account account = await _context.Accounts.FirstOrDefaultAsync(acc => acc.Email.Equals(email));
+
+            if (account == null)
+            {
+                return BadRequest("Email doesn't existed!");
+            }
+            account.Password = newPass;
+            _context.Accounts.Update(account);
+            _context.SaveChanges();
+            var emailDTO = new EmailDTO
+            {
+                To = email,
+                Body = "<h1>This is your new password</h1> <p>" + newPass + "</p>",
+                Subject = "Reset Password"
+            };
+            _emailService.SendEmail(emailDTO);
+            return Ok();
+        }
+
+        [HttpPost]
+        public IActionResult SendMail(EmailDTO emailDTO)
+        {
+            _emailService.SendEmail(emailDTO);
+            return Ok();
+        }
+
     }
 }

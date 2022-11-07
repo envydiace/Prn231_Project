@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 
 namespace ClientApp.Controllers
 {
+    
     public class PermissionController : Controller
     {
         public IActionResult Login()
@@ -41,13 +42,36 @@ namespace ClientApp.Controllers
                         return RedirectToAction("Login", "Permission");
                     }
                 }
-                   
             }
-           
         }
         public IActionResult Register()
         {
             return View("~/Views/Register.cshtml");
         }
+
+        public IActionResult ForgotPass()
+        {
+            return View("~/Views/ForgotPass.cshtml");
+        }
+
+        public async Task< IActionResult> ResetPassword(EmailView view)
+        {
+            using (var Client = new HttpClient())
+            {
+                Client.BaseAddress = new Uri("http://localhost:5000/api/");
+                Client.DefaultRequestHeaders.Accept.Clear();
+                Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage response = await Client.PostAsJsonAsync("ForgotPassword?email="+ view.Email, "");
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
+            }
+        }
+
     }
 }

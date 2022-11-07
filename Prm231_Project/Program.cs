@@ -7,6 +7,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OpenApi.Models;
 using Prm231_Project.Models;
+using Prm231_Project.Utils.Mail;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -97,6 +98,8 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
+
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
