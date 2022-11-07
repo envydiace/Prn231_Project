@@ -277,13 +277,36 @@ namespace ClientApp.Controllers
                     string results = response.Content.ReadAsStringAsync().Result;
                     DashboardView dashboard = JsonConvert.DeserializeObject<DashboardView>(results);
                     ViewData["dashboard"] = dashboard;
-                    return View();
+                    
                 }
                 else
                 {
                     return RedirectToAction("Login", "Permission");
                 }
             }
+
+            using (var Client = new HttpClient())
+            {
+                Client.BaseAddress = new Uri(baseUrl);
+                Client.DefaultRequestHeaders.Accept.Clear();
+                Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                string token = HttpContext.Session.GetString("token");
+                Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+                HttpResponseMessage response = await Client.GetAsync("Dashboard/GetStaticOrder");
+                if (response.IsSuccessStatusCode)
+                {
+                    string results = response.Content.ReadAsStringAsync().Result;
+                    List<int> orders = JsonConvert.DeserializeObject<List<int>>(results);
+                    ViewData["orders"] = results;
+
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
+            }
+
+            return View();
         }
 
         private async Task<ProductEdit> GetProductById(int id)

@@ -3,6 +3,7 @@
 *@
 @{
     var dashboard = ViewData["dashboard"] as DashboardView;
+    var orders = ViewData["orders"] as string;
 }
 
 <div id="content">
@@ -61,13 +62,13 @@
 <script>
     function OrdersChart() {
         var xValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
         new Chart("myChart1", {
             type: "line",
             data: {
                 labels: xValues,
                 datasets: [{
-                    data: [1600, 1700, 1700, 1900, 2000, 2700, 4000, 5000, 6000, 7000],
+                    //data: [1600, 1700, 1700, 1900, 2000, 2700, 4000, 5000, 6000, 7000],
+                    data:   @orders ,
                     borderColor: "sienna",
                     fill: true
                 }]
@@ -80,7 +81,8 @@
 
     function CustomersChart() {
         var xValues = ["Total", "New customer"];
-        var yValues = [200, 50, 300];
+        //var yValues = [200, 50, 300];
+        var yValues = [@dashboard.TotalCustomer, @(dashboard.TotalCustomer - dashboard.TotalGuest ) , @(dashboard.TotalCustomer + dashboard.TotalGuest )];
         var barColors = ["green", "red"];
 
         new Chart("myChart2", {

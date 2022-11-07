@@ -34,5 +34,18 @@ namespace Prm231_Project.Controllers
             };
             return Ok(dashboardDTO) ;
         }
+
+        [HttpGet("[action]")]
+        public IActionResult GetStaticOrder()
+        {
+            var result = new List<int>();
+            for (int i = 1; i <= 12; i++)
+            {
+                var orderByMonth = _context.Orders.Where(o => o.OrderDate!=null && o.OrderDate.Value.Month == i).ToList();
+                result.Add(orderByMonth.Count);
+            }
+           
+            return Ok(result);
+        }
     }
 }
