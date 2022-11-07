@@ -33,6 +33,7 @@ namespace ClientApp.Controllers
                     string results = productResponse.Content.ReadAsStringAsync().Result;
                     List<ProductView> products = JsonConvert.DeserializeObject<List<ProductView>>(results);
                     ViewData["products"] = products;
+                    HttpContext.Session.SetString(Constants._isAdmin, "true");
                 }
                 else if (productResponse.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
                 {
@@ -40,6 +41,7 @@ namespace ClientApp.Controllers
                 }
                 else if (productResponse.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
                 {
+                    HttpContext.Session.SetString(Constants._isAdmin, "false");
                     return RedirectToAction("Index", "Home");
                 }
                 else

@@ -49,6 +49,8 @@ namespace Prm231_Project.DTO
                 map => map.MapFrom(
                     first => first.Accounts != null ? first.Accounts.FirstOrDefault().Email : null
                     ));
+
+
         }
     }
 }

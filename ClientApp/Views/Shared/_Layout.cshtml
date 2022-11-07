@@ -1,4 +1,11 @@
-﻿<!DOCTYPE html>
+﻿
+@{
+    var cart = Context.Session.GetString(Constants._cartKey);
+    var token = Context.Session.GetString(Constants._token);
+    var isAdmin = Context.Session.GetString(Constants._isAdmin);
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -11,20 +18,45 @@
 </head>
 <body>
     <div class="container">
-        <div id="header">
-            <div id="logo">
-                <a asp-area="" asp-controller="Home" asp-action="Index"><img src="~/img/logo.png" /></a>
+        @if (isAdmin != null && isAdmin.Equals("true"))
+        {
+            <div id="header">
+                <div id="logo-admin">
+                    Ecommerce Admin
+                </div>
+                <div id="banner-admin">
+                    <ul>
+                        <li><a asp-controller="Permission" asp-action="Login">SignOut</a></li>
+                    </ul>
+                </div>
             </div>
-            <div id="banner">
-                <ul>
-                    <li><a asp-controller="Cart" asp-action="CustomerCart">Cart: 0</a></li>
-                    <li><a asp-controller="Permission" asp-action="Login">SignIn</a></li>
-                    <li><a asp-action="Register" asp-controller="Permission">SignUp</a></li>
-                    <li><a asp-action="Info" asp-controller="Customer">Profile</a></li>
-                    <li><a asp-controller="Permission" asp-action="Login">SignOut</a></li>
-                </ul>
+        }
+        else
+        {
+            <div id="header">
+                <div id="logo">
+                    <a asp-area="" asp-controller="Home" asp-action="Index"><img src="~/img/logo.png" /></a>
+                </div>
+                <div id="banner">
+                    <ul>
+                        <li><a asp-controller="Cart" asp-action="CustomerCart">Cart: @(cart!=null?JsonConvert.DeserializeObject<List<CartItemView>>(cart).Count:0)</a></li>
+                        @if (token != null)
+                        {
+                            <li><a asp-action="Info" asp-controller="Customer">Profile</a></li>
+                            <li><a asp-controller="Permission" asp-action="Login">SignOut</a></li>
+                        }
+                        else
+                        {
+                            <li><a asp-controller="Permission" asp-action="Login">SignIn</a></li>
+                            <li><a asp-action="Register" asp-controller="Permission">SignUp</a></li>
+                        }
+
+
+                    </ul>
+                </div>
             </div>
-        </div>
+        }
+
 
         <main role="main" class="pb-3">
 

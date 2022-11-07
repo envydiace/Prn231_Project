@@ -1,9 +1,10 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Cart";
     var cart = ViewData["cart"] as IEnumerable<CartItemView>;
     decimal totalPrice = 0;
+    var cusInfo = ViewData["customerInfo"] as CustomerInfoView;
 }
+@model CustomerInfoView
 <div id="content">
     <div id="cart">
         <div id="cart-title">
@@ -12,7 +13,6 @@
         <div id="cart-content">
             @foreach (var item in cart)
             {
-
                 totalPrice += (item.UnitPrice != null ? item.UnitPrice.Value : 0) * item.Quantity;
 
                 <div class="cart-item">
@@ -27,12 +27,12 @@
                             @item.UnitPrice $
                         </div>
                         <div class="cart-item-button">
-                            <a asp-action="RemoveCartItem" asp-controller="Cart" asp-route-id="@item.ProductID" >Remove</a>
+                            <a asp-action="RemoveCartItem" asp-controller="Cart" asp-route-id="@item.ProductID">Remove</a>
                         </div>
                     </div>
                     <div class="cart-item-function">
-                        <a asp-action="UpdateCartItemQuantity" asp-controller="Cart" asp-route-id="@item.ProductID" asp-route-quantity="@(item.Quantity - 1)" >-</a>
-                        <a asp-action="UpdateCartItemQuantity" asp-controller="Cart" asp-route-id="@item.ProductID" asp-route-quantity="@(item.Quantity + 1)" >+</a>
+                        <a asp-action="UpdateCartItemQuantity" asp-controller="Cart" asp-route-id="@item.ProductID" asp-route-quantity="@(item.Quantity - 1)">-</a>
+                        <a asp-action="UpdateCartItemQuantity" asp-controller="Cart" asp-route-id="@item.ProductID" asp-route-quantity="@(item.Quantity + 1)">+</a>
                         <input type="text" value="@item.Quantity" disabled />
                     </div>
                 </div>
@@ -41,19 +41,33 @@
         <div id="cart-summary">
             <div id="cart-summary-content">Total amount: <span style="color:red">@totalPrice $</span></div>
         </div>
-        <form method="post">
+        <form asp-action="OrderCart" asp-controller="Cart">
             <div id="customer-info">
                 <div id="customer-info-content">
                     <h3>CUSTOMER INFORMATION:</h3>
                     <div id="customer-info-detail">
-                        <div id="customer-info-left">
-                            <input type="text" placeholder="Company name *" /><br />
-                            <input type="text" placeholder="Contact name *" /><br />
-                        </div>
-                        <div id="customer-info-right">
-                            <input type="text" placeholder="Contact title *" /><br />
-                            <input type="text" placeholder="Address *" /><br />
-                        </div>
+                        @if (cusInfo != null)
+                        {
+                            <div id="customer-info-left">
+                                <input asp-for="@cusInfo.CompanyName" disabled /><br />
+                                <input asp-for="@cusInfo.ContactName" disabled /><br />
+                            </div>
+                            <div id="customer-info-right">
+                                <input asp-for="@cusInfo.ContactTitle" disabled /><br />
+                                <input asp-for="@cusInfo.Address" disabled /><br />
+                            </div>
+                        }
+                        else
+                        {
+                            <div id="customer-info-left">
+                                <input asp-for="CompanyName" placeholder="Company name *" required /><br />
+                                <input asp-for="ContactName" placeholder="Contact name *" required /><br />
+                            </div>
+                            <div id="customer-info-right">
+                                <input asp-for="ContactTitle" placeholder="Contact title *" required /><br />
+                                <input asp-for="Address" placeholder="Address *" required /><br />
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -73,7 +87,8 @@
                 </div>
             </div>
             <div id="cart-order">
-                <input type="button" value="ORDER" />
+                    <input type="submit" value="ORDER" />
+               
             </div>
         </form>
     </div>

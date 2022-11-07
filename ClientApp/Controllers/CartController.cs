@@ -3,18 +3,50 @@ using ClientApp.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Net.Http.Headers;
 
 namespace ClientApp.Controllers
 {
     public class CartController : Controller
     {
-        public IActionResult CustomerCart()
+        public string baseUrl = "http://localhost:5000/api/";
+        public async Task<IActionResult> CustomerCart()
         {
+            string token = HttpContext.Session.GetString("token");
+            if (token != null)
+            {
+                using (var Client = new HttpClient())
+                {
+                    Client.BaseAddress = new Uri(baseUrl);
+                    Client.DefaultRequestHeaders.Accept.Clear();
+                    Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+                    HttpResponseMessage response = await Client.GetAsync("Customer/GetCustomer");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string results = response.Content.ReadAsStringAsync().Result;
+                        CustomerInfoView cus = JsonConvert.DeserializeObject<CustomerInfoView>(results);
+                        ViewData["customerInfo"] = cus;
+                    }
+                    else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
+                    {
+                        return RedirectToAction("Login", "Permission");
+                    }
+                    else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
+                    {
+                        return RedirectToAction("Login", "Permission");
+                    }
+                    else
+                    {
+                        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                    }
+                }
+            }
             ViewData["cart"] = this.GetCustomerCart();
             return View("~/Views/Customer/Cart.cshtml");
         }
 
-        private string _cartKey = "Cart";
+        private string _cartKey = Constants._cartKey;
 
         private List<CartItemView> GetCustomerCart()
         {
@@ -35,7 +67,6 @@ namespace ClientApp.Controllers
             HttpContext.Session.Remove(_cartKey);
         }
 
-        //[HttpDelete("[action]")]
         //public IActionResult DeleteCart()
         //{
         //    ClearCart();
@@ -67,7 +98,6 @@ namespace ClientApp.Controllers
                     Console.WriteLine("Error Calling web API");
                     return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
                 }
-
             }
             else
             {
@@ -89,7 +119,6 @@ namespace ClientApp.Controllers
             SaveCartSession(cart);
             return RedirectToAction(nameof(CustomerCart));
         }
-
         public IActionResult UpdateCartItemQuantity(int id, int quantity)
         {
             var cart = GetCustomerCart();
@@ -111,51 +140,39 @@ namespace ClientApp.Controllers
             return RedirectToAction(nameof(CustomerCart));
         }
 
-        //[HttpPost("[action]")]
-        //public async Task<IActionResult> OrderCartAsync([FromForm] CustomerOrderInfoDTO custInfo)
-        //{
-        //    var listOrderDetails = this.GetCustomerCart();
-        //    var header = Request.Headers["Authorization"];
-        //    string cusId = "";
+        public async Task<IActionResult> OrderCart(CustomerInfoView customerInfo)
+        {
+            DateTime now = DateTime.Now;
+            OrderCartView orderCart = new OrderCartView
+            {
+                Address = customerInfo.Address,
+                CompanyName = customerInfo.CompanyName,
+                ContactName = customerInfo.ContactName,
+                ContactTitle = customerInfo.ContactTitle,
+                RequiredDate = new DateTime(now.Year, now.Month, now.Day + 2),
+                Items = this.GetCustomerCart()
+            };
+            string token = HttpContext.Session.GetString("token");
+            using (var Client = new HttpClient())
+            {
+                Client.BaseAddress = new Uri(baseUrl);
+                Client.DefaultRequestHeaders.Accept.Clear();
+                Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                if (token != null)
+                {
+                    Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+                }
+                HttpResponseMessage response = await Client.PostAsJsonAsync("Cart/OrderCart", orderCart);
+                if (response.IsSuccessStatusCode)
+                {
+                    ClearCart();
+                    return RedirectToAction(nameof(CustomerCart));
+                }else
+                {
+                    return RedirectToAction(nameof(CustomerCart));
+                }
+            }
+        }
 
-        //    if (header.Count > 0)
-        //    {
-        //        var token = header[0].Split(" ")[1];
-        //        var handler = new JwtSecurityTokenHandler();
-        //        var jwt = handler.ReadJwtToken(token);
-        //        cusId = jwt.Claims.First(claim => claim.Type == "CustomerId").Value;
-        //    }
-        //    else
-        //    {
-        //        Random random = new Random();
-        //        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        //        bool existed = true;
-        //        while (existed)
-        //        {
-        //            cusId = new string(Enumerable.Repeat(chars, 5)
-        //                .Select(s => s[random.Next(s.Length)]).ToArray());
-        //            Customer customer = await _context.Customers.FirstOrDefaultAsync(c => c.CustomerId.Equals(cusId));
-        //            if (customer == null)
-        //            {
-        //                existed = false;
-        //            }
-        //        }
-        //        Customer c = new Customer
-        //        {
-        //            CustomerId = cusId,
-        //            CompanyName = custInfo.CompanyName != null ? custInfo.CompanyName : "",
-        //            ContactName = custInfo.ContactName,
-        //            ContactTitle = custInfo.ContactTitle,
-        //            Address = custInfo.Address
-        //        };
-        //        return Ok(c);
-        //    }
-        //    //Order order = new Order
-        //    //{
-        //    //    OrderDate = DateTime.Now,
-        //    //    RequiredDate = custInfo.RequiredDate
-        //    //};
-        //    return Ok(cusId);
-        //}
     }
 }

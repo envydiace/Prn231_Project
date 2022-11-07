@@ -1,4 +1,5 @@
 ﻿using ClientApp.Models;
+using ClientApp.Utils;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Net.Http.Headers;
@@ -9,7 +10,9 @@ namespace ClientApp.Controllers
     {
         public IActionResult Login()
         {
-            HttpContext.Session.Clear();
+            HttpContext.Session.Remove(Constants._isAdmin);
+            HttpContext.Session.Remove(Constants._token);
+            HttpContext.Session.Remove(Constants._cusName);
             return View("~/Views/Login.cshtml");
         }
 
@@ -30,7 +33,7 @@ namespace ClientApp.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         string result = await response.Content.ReadAsStringAsync();
-                        HttpContext.Session.SetString("token", result.Substring(1,result.Length-2));
+                        HttpContext.Session.SetString(Constants._token, result.Substring(1,result.Length-2));
                         return RedirectToAction("Product", "Admin");
                     }
                     else

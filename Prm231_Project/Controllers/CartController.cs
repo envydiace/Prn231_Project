@@ -144,19 +144,21 @@ namespace Prm231_Project.Controllers
         }
         
         [HttpPost("[action]")]
-        public async Task<IActionResult> OrderCartAsync([FromForm] CustomerOrderInfoDTO custInfo)
+        public async Task<IActionResult> OrderCartAsync(CustomerOrderInfoDTO custInfo)
         {
             var listOrderDetails = this.GetCustomerCart();
             var header = Request.Headers["Authorization"];
             string cusId = "";
-            
+            Customer c;
             if (header.Count > 0)
             {
                 var token = header[0].Split(" ")[1];
                 var handler = new JwtSecurityTokenHandler();
                 var jwt = handler.ReadJwtToken(token);
                 cusId = jwt.Claims.First(claim => claim.Type == "CustomerId").Value;
-            }else
+                c = await _context.Customers.FirstOrDefaultAsync(c => c.CustomerId.Equals(cusId));
+            }
+            else
             {
                 Random random = new Random();
                 const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -171,7 +173,7 @@ namespace Prm231_Project.Controllers
                         existed = false;
                     }
                 }
-                Customer c = new Customer
+                c = new Customer
                 {
                     CustomerId = cusId,
                     CompanyName = custInfo.CompanyName != null ? custInfo.CompanyName : "",
@@ -179,14 +181,33 @@ namespace Prm231_Project.Controllers
                     ContactTitle = custInfo.ContactTitle,
                     Address = custInfo.Address
                 };
-                return Ok(c);
+                _context.Customers.Add(c);
+                _context.SaveChanges();
+
             }
-            //Order order = new Order
-            //{
-            //    OrderDate = DateTime.Now,
-            //    RequiredDate = custInfo.RequiredDate
-            //};
-            return Ok(cusId);
+            Order order = new Order
+            {
+                OrderDate = DateTime.Now,
+                RequiredDate = custInfo.RequiredDate,
+                CustomerId = c.CustomerId,
+                ShipAddress = c.Address
+            };
+            await _context.Orders.AddAsync(order);
+            await _context.SaveChangesAsync();
+            foreach(var item in custInfo.Items)
+            {
+                OrderDetail orderDetail = new OrderDetail
+                {
+                    OrderId = order.OrderId,
+                    ProductId = item.ProductID,
+                    Quantity = (short)item.Quantity,
+                    Discount = 0,
+                    UnitPrice = item.UnitPrice != 0 ? item.UnitPrice.Value : 0
+                };
+                await _context.OrderDetails.AddAsync(orderDetail);
+                await _context.SaveChangesAsync();
+            }
+            return Ok(order);
         }
     }
 }

@@ -4,11 +4,12 @@
 @{
     ViewData["Title"] = "Profile";
     var orders = ViewData["orders"] as IEnumerable<OrderView>;
+    var cusName = Context.Session.GetString(Constants._cusName);
 }
 
 <div id="content">
     <div id="content-left">
-        <h3 style="font-weight: normal;">Welcome</h3>
+        <h3 style="font-weight: normal;">Welcome, @cusName</h3>
         <h3>Account Management</h3>
         <ul>
             <a asp-action="Info" asp-controller="Customer">

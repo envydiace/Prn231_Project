@@ -1,4 +1,5 @@
 ﻿using ClientApp.Models;
+using ClientApp.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Diagnostics;
@@ -26,6 +27,7 @@ namespace ClientApp.Controllers
                     string results = response.Content.ReadAsStringAsync().Result;
                     CustomerInfoView cus = JsonConvert.DeserializeObject<CustomerInfoView>(results);
                     ViewData["customerInfo"] = cus;
+                    HttpContext.Session.SetString(Constants._cusName,cus.ContactName);
                 }
                 else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
                 {
