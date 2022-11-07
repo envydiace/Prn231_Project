@@ -8,7 +8,7 @@
 <div id="content">
     <div id="content-detail">
         <div id="content-title">
-            <a asp-controller="Home" asp-action="Index" >Home</a> >
+            <a asp-controller="Home" asp-action="Index">Home</a> >
             <a href="#">@product.CategoryName</a> >
             Model: @product.ProductName
         </div>
@@ -33,8 +33,12 @@
                             <div id="product-status">In stock</div>
                             <div id="product-detail-buttons">
                                 <div id="product-detail-button">
-                                    <input type="button" value="BUY NOW">
-                                    <input type="button" value="ADD TO CART" style="background-color: #fff; color:red;border: 1px solid gray;">
+                                    <form>
+                                        <input type="submit" value="BUY NOW">
+                                    </form>
+                                    <form asp-action="AddToCart" asp-route-id="@product.ProductId" asp-route-quantity="1" asp-controller="Cart" >
+                                        <input type="submit" value="ADD TO CART" style="background-color: #fff; color:red;border: 1px solid gray;">
+                                    </form>
                                 </div>
                             </div>
                         </div>

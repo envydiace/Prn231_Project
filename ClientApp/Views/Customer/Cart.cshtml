@@ -1,0 +1,80 @@
+﻿
+@{
+    ViewData["Title"] = "Cart";
+    var cart = ViewData["cart"] as IEnumerable<CartItemView>;
+    decimal totalPrice = 0;
+}
+<div id="content">
+    <div id="cart">
+        <div id="cart-title">
+            <h3>SHOPPING CART</h3>
+        </div>
+        <div id="cart-content">
+            @foreach (var item in cart)
+            {
+
+                totalPrice += (item.UnitPrice != null ? item.UnitPrice.Value : 0) * item.Quantity;
+
+                <div class="cart-item">
+                    <div class="cart-item-infor">
+                        <div class="cart-item-img">
+                            <img src="~/img/1.jpg" />
+                        </div>
+                        <div class="cart-item-name">
+                            <a asp-action="ProductDetail" asp-controller="Home" asp-route-id="@item.ProductID">@item.ProductName</a>
+                        </div>
+                        <div class="cart-item-price">
+                            @item.UnitPrice $
+                        </div>
+                        <div class="cart-item-button">
+                            <a asp-action="RemoveCartItem" asp-controller="Cart" asp-route-id="@item.ProductID" >Remove</a>
+                        </div>
+                    </div>
+                    <div class="cart-item-function">
+                        <a asp-action="UpdateCartItemQuantity" asp-controller="Cart" asp-route-id="@item.ProductID" asp-route-quantity="@(item.Quantity - 1)" >-</a>
+                        <a asp-action="UpdateCartItemQuantity" asp-controller="Cart" asp-route-id="@item.ProductID" asp-route-quantity="@(item.Quantity + 1)" >+</a>
+                        <input type="text" value="@item.Quantity" disabled />
+                    </div>
+                </div>
+            }
+        </div>
+        <div id="cart-summary">
+            <div id="cart-summary-content">Total amount: <span style="color:red">@totalPrice $</span></div>
+        </div>
+        <form method="post">
+            <div id="customer-info">
+                <div id="customer-info-content">
+                    <h3>CUSTOMER INFORMATION:</h3>
+                    <div id="customer-info-detail">
+                        <div id="customer-info-left">
+                            <input type="text" placeholder="Company name *" /><br />
+                            <input type="text" placeholder="Contact name *" /><br />
+                        </div>
+                        <div id="customer-info-right">
+                            <input type="text" placeholder="Contact title *" /><br />
+                            <input type="text" placeholder="Address *" /><br />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="customer-info">
+                <div id="customer-info-content">
+                    <h3>PAYMENT METHODS:</h3>
+                    <div id="customer-info-payment">
+                        <div>
+                            <input type="radio" name="rbPaymentMethod" checked />
+                            Payment C.O.D - Payment on delivery
+                        </div>
+                        <div>
+                            <input type="radio" name="rbPaymentMethod" disabled />
+                            Payment via online payment gateway
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="cart-order">
+                <input type="button" value="ORDER" />
+            </div>
+        </form>
+    </div>
+</div>
