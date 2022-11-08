@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Prm231_Project.Models
 {
+    
     public partial class Account
     {
         public int AccountId { get; set; }

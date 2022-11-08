@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Prm231_Project.Utils.Authentication;
 
 namespace Prm231_Project.Models
 {
-    public partial class PRN231DBContext : DbContext
+    public partial class PRN231DBContext : IdentityDbContext<ApplicationUser>
     {
         public PRN231DBContext()
         {
@@ -15,6 +17,7 @@ namespace Prm231_Project.Models
             : base(options)
         {
         }
+
 
         public virtual DbSet<Account> Accounts { get; set; } = null!;
         public virtual DbSet<Category> Categories { get; set; } = null!;
@@ -260,6 +263,7 @@ namespace Prm231_Project.Models
             });
 
             OnModelCreatingPartial(modelBuilder);
+            base.OnModelCreating(modelBuilder);
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
