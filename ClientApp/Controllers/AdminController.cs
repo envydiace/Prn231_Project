@@ -184,7 +184,7 @@ namespace ClientApp.Controllers
                 }
             }
         }
-        public async Task<ActionResult> Order(OrderSearchView searchView)
+        public async Task<ActionResult> Order(OrderSearchView? searchView)
         {
             string param = "";
             if (searchView.From != null)
@@ -223,13 +223,8 @@ namespace ClientApp.Controllers
                     return RedirectToAction("Login", "Permission");
                 }
             }
-            return View();
-        }
-
-        public IActionResult Filter(OrderSearchView filter)
-        {
-
-            return RedirectToAction(nameof(Order), filter);
+            ViewData["searchView"] = searchView;
+            return View(searchView);
         }
 
         public async Task<ActionResult> CancelOrder(int id)
@@ -261,8 +256,40 @@ namespace ClientApp.Controllers
                 }
             }
         }
+        public async Task<ActionResult> OrderDetail(int id)
+        {
+            using (var Client = new HttpClient())
+            {
+                Client.BaseAddress = new Uri(baseUrl);
+                Client.DefaultRequestHeaders.Accept.Clear();
+                Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                string token = HttpContext.Session.GetString("token");
+                Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+                HttpResponseMessage response = await Client.GetAsync("Order/GetOrderDetail?id="+ id);
 
-        public async Task< IActionResult >Dashboard()
+                if (response.IsSuccessStatusCode)
+                {
+                    string results = response.Content.ReadAsStringAsync().Result;
+                    OrderView orderDetail = JsonConvert.DeserializeObject<OrderView>(results);
+                    ViewData["orderDetail"] = orderDetail;
+                }
+                else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
+                else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
+            }
+            return View();
+        }
+
+        public async Task< IActionResult >Dashboard(int year)
         {
             using (var Client = new HttpClient())
             {
@@ -292,7 +319,7 @@ namespace ClientApp.Controllers
                 Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 string token = HttpContext.Session.GetString("token");
                 Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
-                HttpResponseMessage response = await Client.GetAsync("Dashboard/GetStaticOrder");
+                HttpResponseMessage response = await Client.GetAsync("Dashboard/GetStaticOrder?year="+year);
                 if (response.IsSuccessStatusCode)
                 {
                     string results = response.Content.ReadAsStringAsync().Result;

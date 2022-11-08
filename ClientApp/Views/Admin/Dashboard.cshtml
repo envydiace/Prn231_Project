@@ -5,6 +5,7 @@
     var dashboard = ViewData["dashboard"] as DashboardView;
     var orders = ViewData["orders"] as string;
 }
+@model DashboardFilter;
 
 <div id="content">
     <div id="content-left">
@@ -44,6 +45,9 @@
                     </div>
                 </div>
                 <div id="dashboard-2">
+                    <form asp-action="Dashboard" asp-controller="Admin">
+                        <input onchange="this.form.submit();" asp-for="Year" />
+                    </form>
                     <div id="chart" style="text-align: center;">
                         <div id="chart1">
                             <h3>Statistic Orders (Month)</h3>
@@ -68,7 +72,7 @@
                 labels: xValues,
                 datasets: [{
                     //data: [1600, 1700, 1700, 1900, 2000, 2700, 4000, 5000, 6000, 7000],
-                    data:   @orders ,
+                    data: @orders ,
                     borderColor: "sienna",
                     fill: true
                 }]

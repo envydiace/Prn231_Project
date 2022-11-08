@@ -1,5 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Login";
+    var error = ViewData["error"] as string;
 }
 @model LoginView
 <div id="content">
@@ -20,6 +21,10 @@
                 <input type="password" asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
                 <br />
+                @if (error != null)
+                {
+                    <div><span style="color: red;">@error</span></div>
+                }
                 <div><a asp-action="ForgotPass" asp-controller="Permission">Forgot password?</a></div>
                 <input type="submit" value="SIGN IN" /><br />
                 <input type="button" value="FACEBOOK LOGIN" style="background-color: #3b5998;" /><br />

@@ -36,15 +36,15 @@ namespace Prm231_Project.Controllers
         }
 
         [HttpGet("[action]")]
-        public IActionResult GetStaticOrder()
+        public IActionResult GetStaticOrder(int year)
         {
+            var list = _context.Orders.Where(o => o.OrderDate.Value.Year == year);
             var result = new List<int>();
             for (int i = 1; i <= 12; i++)
             {
-                var orderByMonth = _context.Orders.Where(o => o.OrderDate!=null && o.OrderDate.Value.Month == i).ToList();
+                var orderByMonth = list.Where(o => o.OrderDate!=null && o.OrderDate.Value.Month == i).ToList();
                 result.Add(orderByMonth.Count);
             }
-           
             return Ok(result);
         }
     }

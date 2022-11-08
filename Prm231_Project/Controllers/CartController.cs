@@ -100,7 +100,8 @@ namespace Prm231_Project.Controllers
                     UnitPrice = product.UnitPrice
                 };
                 cart.Add(item);
-            }else
+            }
+            else
             {
                 item.Quantity += cartItem.Quantity;
             }
@@ -123,7 +124,7 @@ namespace Prm231_Project.Controllers
         }
 
         [HttpPut("[action]")]
-        public IActionResult UpdateCartItemQuantity(int id,int quantity)
+        public IActionResult UpdateCartItemQuantity(int id, int quantity)
         {
             var cart = GetCustomerCart();
             var item = cart.Where(c => c.ProductID == id).FirstOrDefault();
@@ -135,79 +136,88 @@ namespace Prm231_Project.Controllers
             {
                 item.Quantity = quantity;
                 SaveCartCookie(cart);
-            }else
+            }
+            else
             {
                 cart.Remove(item);
                 SaveCartCookie(cart);
             }
             return Ok("Update Success!");
         }
-        
+
         [HttpPost("[action]")]
         public async Task<IActionResult> OrderCartAsync(CustomerOrderInfoDTO custInfo)
         {
-            var listOrderDetails = this.GetCustomerCart();
-            var header = Request.Headers["Authorization"];
-            string cusId = "";
-            Customer c;
-            if (header.Count > 0)
+            if (custInfo.Items.Count > 0)
             {
-                var token = header[0].Split(" ")[1];
-                var handler = new JwtSecurityTokenHandler();
-                var jwt = handler.ReadJwtToken(token);
-                cusId = jwt.Claims.First(claim => claim.Type == "CustomerId").Value;
-                c = await _context.Customers.FirstOrDefaultAsync(c => c.CustomerId.Equals(cusId));
+
+
+                var header = Request.Headers["Authorization"];
+                string cusId = "";
+                Customer c;
+                if (header.Count > 0)
+                {
+                    var token = header[0].Split(" ")[1];
+                    var handler = new JwtSecurityTokenHandler();
+                    var jwt = handler.ReadJwtToken(token);
+                    cusId = jwt.Claims.First(claim => claim.Type == "CustomerId").Value;
+                    c = await _context.Customers.FirstOrDefaultAsync(c => c.CustomerId.Equals(cusId));
+                }
+                else
+                {
+                    Random random = new Random();
+                    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                    bool existed = true;
+                    while (existed)
+                    {
+                        cusId = new string(Enumerable.Repeat(chars, 5)
+                            .Select(s => s[random.Next(s.Length)]).ToArray());
+                        Customer customer = await _context.Customers.FirstOrDefaultAsync(c => c.CustomerId.Equals(cusId));
+                        if (customer == null)
+                        {
+                            existed = false;
+                        }
+                    }
+                    c = new Customer
+                    {
+                        CustomerId = cusId,
+                        CompanyName = custInfo.CompanyName != null ? custInfo.CompanyName : "",
+                        ContactName = custInfo.ContactName,
+                        ContactTitle = custInfo.ContactTitle,
+                        Address = custInfo.Address
+                    };
+                    _context.Customers.Add(c);
+                    _context.SaveChanges();
+
+                }
+                Order order = new Order
+                {
+                    OrderDate = DateTime.Now,
+                    RequiredDate = custInfo.RequiredDate,
+                    CustomerId = c.CustomerId,
+                    ShipAddress = c.Address
+                };
+                await _context.Orders.AddAsync(order);
+                await _context.SaveChangesAsync();
+                foreach (var item in custInfo.Items)
+                {
+                    OrderDetail orderDetail = new OrderDetail
+                    {
+                        OrderId = order.OrderId,
+                        ProductId = item.ProductID,
+                        Quantity = (short)item.Quantity,
+                        Discount = 0,
+                        UnitPrice = item.UnitPrice != 0 ? item.UnitPrice.Value : 0
+                    };
+                    await _context.OrderDetails.AddAsync(orderDetail);
+                    await _context.SaveChangesAsync();
+                }
+                return Ok(order);
             }
             else
             {
-                Random random = new Random();
-                const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                bool existed = true;
-                while (existed)
-                {
-                    cusId = new string(Enumerable.Repeat(chars, 5)
-                        .Select(s => s[random.Next(s.Length)]).ToArray());
-                    Customer customer = await _context.Customers.FirstOrDefaultAsync(c => c.CustomerId.Equals(cusId));
-                    if (customer == null)
-                    {
-                        existed = false;
-                    }
-                }
-                c = new Customer
-                {
-                    CustomerId = cusId,
-                    CompanyName = custInfo.CompanyName != null ? custInfo.CompanyName : "",
-                    ContactName = custInfo.ContactName,
-                    ContactTitle = custInfo.ContactTitle,
-                    Address = custInfo.Address
-                };
-                _context.Customers.Add(c);
-                _context.SaveChanges();
-
+                return BadRequest();
             }
-            Order order = new Order
-            {
-                OrderDate = DateTime.Now,
-                RequiredDate = custInfo.RequiredDate,
-                CustomerId = c.CustomerId,
-                ShipAddress = c.Address
-            };
-            await _context.Orders.AddAsync(order);
-            await _context.SaveChangesAsync();
-            foreach(var item in custInfo.Items)
-            {
-                OrderDetail orderDetail = new OrderDetail
-                {
-                    OrderId = order.OrderId,
-                    ProductId = item.ProductID,
-                    Quantity = (short)item.Quantity,
-                    Discount = 0,
-                    UnitPrice = item.UnitPrice != 0 ? item.UnitPrice.Value : 0
-                };
-                await _context.OrderDetails.AddAsync(orderDetail);
-                await _context.SaveChangesAsync();
-            }
-            return Ok(order);
         }
     }
 }

@@ -69,8 +69,8 @@ namespace Prm231_Project.Controllers
                 .Include(o => o.Customer)
                 .Include(o => o.Employee)
                 .Where(o =>
-                (from == null || o.OrderDate >= from) &&
-                (to == null || o.OrderDate <= to)
+                (from == null || o.OrderDate.Value.Date >= from.Value.Date) &&
+                (to == null || o.OrderDate.Value.Date <= to.Value.Date)
                 )
                 .ToListAsync();
 
@@ -91,6 +91,17 @@ namespace Prm231_Project.Controllers
                 TotalPages = totalPages,
                 Values = value
             });
+        }
+
+        [HttpGet("[action]")]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<IActionResult> GetOrderDetail(int id)
+        {
+            var result = await _context.Orders
+                .Include(o => o.OrderDetails)
+                .ThenInclude(od => od.Product)
+                .FirstOrDefaultAsync(o => o.OrderId == id);
+            return Ok(mapper.Map<OrderDTO>(result));
         }
 
         [HttpPut("[action]")]

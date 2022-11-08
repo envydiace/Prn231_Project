@@ -3,6 +3,8 @@
     var cart = ViewData["cart"] as IEnumerable<CartItemView>;
     decimal totalPrice = 0;
     var cusInfo = ViewData["customerInfo"] as CustomerInfoView;
+    var error = ViewData["error"] as string;
+    var success = ViewData["success"] as string;
 }
 @model CustomerInfoView
 <div id="content">
@@ -87,8 +89,16 @@
                 </div>
             </div>
             <div id="cart-order">
-                    <input type="submit" value="ORDER" />
-               
+                @if (success != null)
+                {
+                    <div><span style="color:green"> @success </span></div>
+                }
+                @if (error != null)
+                {
+                    <div><span style="color:red"> @error </span></div>
+
+                }
+                <input type="submit" value="ORDER" />
             </div>
         </form>
     </div>

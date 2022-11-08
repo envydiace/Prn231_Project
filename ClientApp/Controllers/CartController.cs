@@ -10,7 +10,7 @@ namespace ClientApp.Controllers
     public class CartController : Controller
     {
         public string baseUrl = "http://localhost:5000/api/";
-        public async Task<IActionResult> CustomerCart()
+        public async Task<IActionResult> CustomerCart(string check)
         {
             string token = HttpContext.Session.GetString("token");
             if (token != null)
@@ -32,6 +32,17 @@ namespace ClientApp.Controllers
                     {
                         return RedirectToAction("Login", "Permission");
                     }
+                }
+            }
+            if (check != null)
+            {
+                if (check.Equals("Fail"))
+                {
+                    ViewData["error"] = "Order Fail!";
+                }
+                else
+                {
+                    ViewData["success"] = "Order Success!";
                 }
             }
             ViewData["cart"] = this.GetCustomerCart();
@@ -156,11 +167,12 @@ namespace ClientApp.Controllers
                 HttpResponseMessage response = await Client.PostAsJsonAsync("Cart/OrderCart", orderCart);
                 if (response.IsSuccessStatusCode)
                 {
+                    
                     ClearCart();
-                    return RedirectToAction(nameof(CustomerCart));
+                    return RedirectToAction(nameof(CustomerCart),new {check = "Success"});
                 }else
                 {
-                    return RedirectToAction(nameof(CustomerCart));
+                    return RedirectToAction(nameof(CustomerCart), new { check = "Fail" });
                 }
             }
         }

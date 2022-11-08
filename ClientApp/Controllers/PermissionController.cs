@@ -9,11 +9,12 @@ namespace ClientApp.Controllers
     
     public class PermissionController : Controller
     {
-        public IActionResult Login()
+        public IActionResult Login(string error)
         {
             HttpContext.Session.Remove(Constants._isAdmin);
             HttpContext.Session.Remove(Constants._token);
             HttpContext.Session.Remove(Constants._cusName);
+            ViewData["error"] = error;
             return View("~/Views/Login.cshtml");
         }
 
@@ -39,7 +40,7 @@ namespace ClientApp.Controllers
                     }
                     else
                     {
-                        return RedirectToAction("Login", "Permission");
+                        return RedirectToAction("Login", "Permission", new {error = "Email or Password is not correct!"});
                     }
                 }
             }

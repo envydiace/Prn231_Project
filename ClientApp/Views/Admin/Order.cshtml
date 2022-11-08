@@ -1,10 +1,8 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@model OrderSearchView
+﻿@model OrderSearchView
 @{
     ViewData["Title"] = "Admin Page";
     var orders = ViewData["orders"] as OrderPagingView;
+    var searchView = ViewData["searchView"] as OrderSearchView;
 }
 
 <div id="content">
@@ -26,7 +24,7 @@
             <div id="content-main-dashboard">
                 <div id="order-title">
                     <b>Filter by Order date:</b>
-                    <form asp-action="Filter" asp-controller="Admin">
+                    <form asp-action="Order" asp-controller="Admin">
                         From: <input asp-for="From" />
                         To: <input asp-for="To" />
                         <input type="submit" value="Filter">
@@ -42,30 +40,32 @@
                             <th>Employee</th>
                             <th>Customer</th>
                             <th>Freight($)</th>
-                            <th>Status</th> 
+                            <th>Status</th>
                         </tr>
                         @foreach (var order in orders.Values)
                         {
                             <tr>
-                                <td><a href="order-detail.html?id=5">#@order.OrderId</a></td>
+                                <td><a asp-action="OrderDetail" asp-controller="Admin" asp-route-id="@order.OrderId">#@order.OrderId</a></td>
                                 <td>@(order.OrderDate!=null ? DateTime.Parse(order.OrderDate.ToString()).ToString("dd-MM-yyyy"):"")</td>
                                 <td>@(order.RequiredDate!=null ? DateTime.Parse(order.RequiredDate.ToString()).ToString("dd-MM-yyyy"):"")</td>
                                 <td>@(order.ShippedDate!=null ? DateTime.Parse(order.ShippedDate.ToString()).ToString("dd-MM-yyyy"):"")</td>
                                 <td>@order.EmployeeName</td>
                                 <td>@order.CustomerName</td>
                                 <td>@order.Freight</td>
-                                @if(order.RequiredDate == null)
+                                @if (order.RequiredDate == null)
                                 {
                                     <td style="color: red;">Order canceled</td>
-                                }else if (order.ShippedDate == null)
+                                }
+                                else if (order.ShippedDate == null)
                                 {
                                     <td style="color: blue;">Pending | <a asp-action="CancelOrder" asp-route-id="@order.OrderId" asp-controller="Admin">Cancel</a></td>
-                                }else
+                                }
+                                else
                                 {
                                     <td style="color: green;">Completed</td>
                                 }
-                                
-                                
+
+
                             </tr>
                         }
                     </table>
