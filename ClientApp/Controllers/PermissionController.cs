@@ -1,6 +1,7 @@
 ﻿using ClientApp.Models;
 using ClientApp.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Net.Http.Headers;
 
@@ -35,7 +36,8 @@ namespace ClientApp.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         string result = await response.Content.ReadAsStringAsync();
-                        HttpContext.Session.SetString(Constants._token, result.Substring(1,result.Length-2));
+                        TokenView token = JsonConvert.DeserializeObject<TokenView>(result);
+                        HttpContext.Session.SetString(Constants._token, token.AccessToken);
                         return RedirectToAction("Product", "Admin");
                     }
                     else

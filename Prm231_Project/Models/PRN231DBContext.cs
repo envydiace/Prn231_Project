@@ -24,10 +24,15 @@ namespace Prm231_Project.Models
         public virtual DbSet<Order> Orders { get; set; } = null!;
         public virtual DbSet<OrderDetail> OrderDetails { get; set; } = null!;
         public virtual DbSet<Product> Products { get; set; } = null!;
+        public virtual DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer("server =LAPTOP-0UTUQB0L\\MSSQLSERVER07; database =PRN231DB;uid=sa;pwd=1234567890;");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -257,6 +262,23 @@ namespace Prm231_Project.Models
                     .WithMany(p => p.Products)
                     .HasForeignKey(d => d.CategoryId)
                     .HasConstraintName("FK_Products_Categories");
+            });
+
+            modelBuilder.Entity<RefreshToken>(entity =>
+            {
+                entity.ToTable("RefreshToken");
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ExpiryDate).HasColumnType("datetime");
+
+                entity.Property(e => e.RefreshToken1).HasColumnName("RefreshToken");
+
+                entity.HasOne(d => d.Account)
+                    .WithMany(p => p.RefreshTokens)
+                    .HasForeignKey(d => d.AccountId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_RefreshToken_Accounts");
             });
 
             OnModelCreatingPartial(modelBuilder);

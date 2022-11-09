@@ -11,6 +11,8 @@ using MimeKit.Text;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Prm231_Project.Utils.Mail;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Prm231_Project.Controllers
 {
@@ -38,7 +40,50 @@ namespace Prm231_Project.Controllers
                 if (acc != null)
                 {
                     //create claims details based on the user information
-                    var claims = new[] {
+                    var result = await this.GenerateToken(acc.AccountId);
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest("Invalid credentials");
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> RefreshToken(RefreshTokenRequest refreshTokenRequest)
+        {
+            if (refreshTokenRequest == null || string.IsNullOrEmpty(refreshTokenRequest.RefreshToken) || refreshTokenRequest.AccountId == 0)
+            {
+                return BadRequest();
+            }
+
+            var refreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(t => t.AccountId == refreshTokenRequest.AccountId);
+            if (refreshToken == null)
+            {
+                return NotFound("Refresh Token not found!");
+            }
+            if (!refreshToken.RefreshToken1.Equals(refreshTokenRequest.RefreshToken))
+            {
+                return BadRequest("Refresh Token is not valid!");
+            }
+            if (refreshToken.ExpiryDate < DateTime.Now)
+            {
+                return BadRequest("Refresh Token expired!"); ;
+            }
+
+            var result = await this.GenerateToken(refreshTokenRequest.AccountId);
+
+            return Ok(result);
+        }
+        private async Task<TokenDTO> GenerateToken(int accountId)
+        {
+            var acc = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountId == accountId);
+            var claims = new[] {
                         new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
@@ -51,36 +96,80 @@ namespace Prm231_Project.Controllers
                         new Claim("Role", acc.Role.ToString())
                     };
 
-                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
 
-                    var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-                    var token = new JwtSecurityToken(
-                        _configuration["Jwt:Issuer"],
-                        _configuration["Jwt:Audience"],
-                        claims,
-                        expires: DateTime.UtcNow.AddSeconds(10),
-                        signingCredentials: signIn);
+            var accessToken = new JwtSecurityToken(
+                _configuration["Jwt:Issuer"],
+                _configuration["Jwt:Audience"],
+                claims,
+                expires: DateTime.Now.AddSeconds(20),
+                signingCredentials: signIn);
 
-                    return Ok(new JwtSecurityTokenHandler().WriteToken(token));
-                }
-                else
-                {
-                    return BadRequest("Invalid credentials");
-                }
-            }
-            else
+            var refreshToken = await this.GenerateRefreshToken();
+            if (acc.RefreshTokens != null && acc.RefreshTokens.Any())
             {
-                return BadRequest();
+                var reToken = await _context.RefreshTokens.FirstOrDefaultAsync(t => t.AccountId == acc.AccountId);
+                _context.RefreshTokens.Remove(reToken);
+                await _context.SaveChangesAsync();
             }
+
+            var reFreshToken = new RefreshToken
+            {
+                AccountId = acc.AccountId,
+                CreatedDate = DateTime.Now,
+                ExpiryDate = DateTime.Now.AddMinutes(15),
+                RefreshToken1 = refreshToken
+            };
+            _context.RefreshTokens.Add(reFreshToken);
+            await _context.SaveChangesAsync();
+
+            var result = new TokenDTO
+            {
+                AccessToken = new JwtSecurityTokenHandler().WriteToken(accessToken),
+                RefreshToken = refreshToken
+            };
+            return result;
         }
+
+        [Authorize]
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Logout()
+        {
+            var header = Request.Headers["Authorization"];
+            var token = header[0].Split(" ")[1];
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(token);
+            var accountId = Convert.ToInt32( jwt.Claims.First(claim => claim.Type == "AccountId").Value);
+
+            var refreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(o => o.AccountId == accountId);
+            if(refreshToken != null)
+            {
+                _context.RefreshTokens.Remove(refreshToken);
+                _context.SaveChanges();
+            }
+            return Ok();
+        }
+
+        private async Task<string> GenerateRefreshToken()
+        {
+            var secureRandomBytes = new byte[32];
+
+            using var randomNumberGenerator = RandomNumberGenerator.Create();
+            await System.Threading.Tasks.Task.Run(() => randomNumberGenerator.GetBytes(secureRandomBytes));
+
+            var refreshToken = Convert.ToBase64String(secureRandomBytes);
+            return refreshToken;
+        }
+
         private async Task<Account> GetAccount(string email, string password)
         {
-            var result = await _context.Accounts.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
+            var result = await _context.Accounts.Include(a => a.RefreshTokens).FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
             return result;
         }
         [HttpPost("[action]")]
-        public async Task<IActionResult> Register( RegisterDTO registerDTO)
+        public async Task<IActionResult> Register(RegisterDTO registerDTO)
         {
             Account account = await _context.Accounts.FirstOrDefaultAsync(acc => acc.Email.Equals(registerDTO.Email));
 
