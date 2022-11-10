@@ -105,5 +105,40 @@ namespace ClientApp.Utils
                 return response;
             }
         }
+
+        public static async Task<ClaimView> GetAccountClaims(string accessToken)
+        {
+            using (var Client = new HttpClient())
+            {
+                Client.BaseAddress = new Uri(baseUrl);
+                Client.DefaultRequestHeaders.Accept.Clear();
+                Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
+                HttpResponseMessage response = await Client.GetAsync("getAccountClaims");
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    ClaimView claim = JsonConvert.DeserializeObject<ClaimView>(result);
+                    return claim;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        public static async Task<HttpResponseMessage> GetRefreshToken(int accountId, string refreshToken)
+        {
+            using (var Client = new HttpClient())
+            {
+                Client.BaseAddress = new Uri(baseUrl);
+                Client.DefaultRequestHeaders.Accept.Clear();
+                Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                RefreshTokenRequest request = new RefreshTokenRequest { AccountId = accountId, RefreshToken = refreshToken };
+                HttpResponseMessage response = await Client.PostAsJsonAsync("RefreshToken", request);
+                return response;
+            }
+        }
     }
 }

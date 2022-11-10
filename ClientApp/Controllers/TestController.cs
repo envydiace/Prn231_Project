@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ClientApp.Utils;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ClientApp.Controllers
 {
     public class TestController : Controller
     {
-        public IActionResult Index()
+        public async Task< IActionResult >Index()
         {
-            ViewData["token"] = HttpContext.Session.GetString("token");
+            var token = HttpContext.Session.GetString(Constants._accessToken);
+            ViewData["claim"] =await Calculate.GetAccountClaims(token);
             return View("~/Views/Test.cshtml");
         }
     }

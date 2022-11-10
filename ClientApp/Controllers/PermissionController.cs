@@ -27,21 +27,30 @@ namespace ClientApp.Controllers
             }
             else
             {
-                
-                    HttpResponseMessage response = await Calculate.callPostApi("Login", loginView);
-                    if (response.IsSuccessStatusCode)
+                HttpResponseMessage response = await Calculate.callPostApi("Login", loginView);
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    TokenView token = JsonConvert.DeserializeObject<TokenView>(result);
+                    HttpContext.Session.SetString(Constants._accessToken, token.AccessToken);
+                    HttpContext.Session.SetString(Constants._refreshToken, token.RefreshToken);
+                    ClaimView claim = await Calculate.GetAccountClaims(token.AccessToken);
+                    if (claim.Role == 1)
                     {
-                        string result = await response.Content.ReadAsStringAsync();
-                        TokenView token = JsonConvert.DeserializeObject<TokenView>(result);
-                        HttpContext.Session.SetString(Constants._accessToken, token.AccessToken);
-                        HttpContext.Session.SetString(Constants._refreshToken, token.RefreshToken);
+                        HttpContext.Session.SetString(Constants._isAdmin, "true");
                         return RedirectToAction("Product", "Admin");
                     }
                     else
                     {
-                        return RedirectToAction("Login", "Permission", new { error = "Email or Password is not correct!" });
+                        HttpContext.Session.SetString(Constants._isAdmin, "false");
+                        return RedirectToAction("Index", "Home");
                     }
-                
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Permission", new { error = "Email or Password is not correct!" });
+                }
+
             }
         }
         public IActionResult Register()

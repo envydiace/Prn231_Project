@@ -141,10 +141,10 @@ namespace Prm231_Project.Controllers
             var token = header[0].Split(" ")[1];
             var handler = new JwtSecurityTokenHandler();
             var jwt = handler.ReadJwtToken(token);
-            var accountId = Convert.ToInt32( jwt.Claims.First(claim => claim.Type == "AccountId").Value);
+            var accountId = Convert.ToInt32(jwt.Claims.First(claim => claim.Type == "AccountId").Value);
 
             var refreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(o => o.AccountId == accountId);
-            if(refreshToken != null)
+            if (refreshToken != null)
             {
                 _context.RefreshTokens.Remove(refreshToken);
                 _context.SaveChanges();
@@ -241,6 +241,31 @@ namespace Prm231_Project.Controllers
             var Role = jwt.Claims.First(claim => claim.Type == "Role").Value;
             var Email = jwt.Claims.First(claim => claim.Type == "Email").Value;
             return Ok(new { CustomerId, EmployeeId, AccountId, Role, Email });
+        }
+
+        [Authorize]
+        [HttpGet("[action]")]
+        public IActionResult getAccountClaims()
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var header = Request.Headers["Authorization"];
+            var token = header[0].Split(" ")[1];
+            var jwt = handler.ReadJwtToken(token);
+            var CustomerId = jwt.Claims.First(claim => claim.Type == "CustomerId").Value;
+            var EmployeeId = !jwt.Claims.First(claim => claim.Type == "EmployeeId").Value.Equals("") ?
+                Convert.ToInt32(jwt.Claims.First(claim => claim.Type == "EmployeeId").Value) : 0;
+            var AccountId = Convert.ToInt32(jwt.Claims.First(claim => claim.Type == "AccountId").Value);
+            var Role = Convert.ToInt32(jwt.Claims.First(claim => claim.Type == "Role").Value);
+            var Email = jwt.Claims.First(claim => claim.Type == "Email").Value;
+
+            return Ok(new ClaimDTO
+            {
+                CustomerId = CustomerId,
+                EmployeeId = EmployeeId,
+                AccountId = AccountId,
+                Role = Role,
+                Email = Email
+            });
         }
 
         [HttpPost("[action]")]
