@@ -94,7 +94,7 @@ namespace Prm231_Project.Controllers
         }
 
         [HttpGet("[action]")]
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize]
         public async Task<IActionResult> GetOrderDetail(int id)
         {
             var result = await _context.Orders

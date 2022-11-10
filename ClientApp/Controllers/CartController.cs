@@ -21,6 +21,22 @@ namespace ClientApp.Controllers
                     CustomerInfoView cus = JsonConvert.DeserializeObject<CustomerInfoView>(results);
                     ViewData["customerInfo"] = cus;
                 }
+                else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
+                {
+                    ClaimView claim = await Calculate.GetAccountClaims(token);
+                    string refreshToken = HttpContext.Session.GetString(Constants._refreshToken);
+                    TokenView tokenView = await Calculate.GetRefreshToken(claim.AccountId, refreshToken);
+                    if (tokenView != null)
+                    {
+                        HttpContext.Session.SetString(Constants._accessToken, tokenView.AccessToken);
+                        HttpContext.Session.SetString(Constants._refreshToken, tokenView.RefreshToken);
+                        return RedirectToAction(nameof(CustomerCart), check);
+                    }
+                    else
+                    {
+                        return RedirectToAction("Login", "Permission");
+                    }
+                }
                 else
                 {
                     return RedirectToAction("Login", "Permission");
@@ -159,7 +175,6 @@ namespace ClientApp.Controllers
                 HttpResponseMessage response = await Client.PostAsJsonAsync("Cart/OrderCart", orderCart);
                 if (response.IsSuccessStatusCode)
                 {
-
                     ClearCart();
                     return RedirectToAction(nameof(CustomerCart), new { check = "Success" });
                 }

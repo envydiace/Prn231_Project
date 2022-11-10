@@ -6,7 +6,7 @@ namespace ClientApp.Utils
 {
     public class Calculate
     {
-        private static string baseUrl = "http://localhost:5000/api/";
+        private static string baseUrl = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("AppSettings")["baseUrl"];   
 
         public static async Task<List<CategoryView>> GetAllCategory()
         {
@@ -113,8 +113,7 @@ namespace ClientApp.Utils
                 Client.BaseAddress = new Uri(baseUrl);
                 Client.DefaultRequestHeaders.Accept.Clear();
                 Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
-                HttpResponseMessage response = await Client.GetAsync("getAccountClaims");
+                HttpResponseMessage response = await Client.GetAsync("getAccountClaims?token="+ accessToken);
                 if (response.IsSuccessStatusCode)
                 {
                     string result = await response.Content.ReadAsStringAsync();
@@ -128,7 +127,7 @@ namespace ClientApp.Utils
             }
         }
 
-        public static async Task<HttpResponseMessage> GetRefreshToken(int accountId, string refreshToken)
+        public static async Task<TokenView> GetRefreshToken(int accountId, string refreshToken)
         {
             using (var Client = new HttpClient())
             {
@@ -137,7 +136,15 @@ namespace ClientApp.Utils
                 Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 RefreshTokenRequest request = new RefreshTokenRequest { AccountId = accountId, RefreshToken = refreshToken };
                 HttpResponseMessage response = await Client.PostAsJsonAsync("RefreshToken", request);
-                return response;
+                if( response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<TokenView>(result);
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
     }

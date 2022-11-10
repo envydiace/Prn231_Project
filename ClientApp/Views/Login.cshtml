@@ -2,6 +2,10 @@
     ViewData["Title"] = "Login";
     var error = ViewData["error"] as string;
 }
+<script>
+    localStorage.removeItem("access");
+    localStorage.removeItem("refreshToken");
+</script>
 @model LoginView
 <div id="content">
     <div id="form">

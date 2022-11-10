@@ -6,13 +6,6 @@
     ViewData["Title"] = "Admin Page";
     var categories = ViewData["categories"] as IEnumerable<CategoryView>;
     var products = ViewData["products"] as IEnumerable<ProductView>;
-    if (ViewData["token"] != null)
-    {
-        <script>
-            var storTest = window['localStorage'];
-            storTest.setItem("accessToken",  '@ViewData["token"]');
-        </script>
-    }
 }
 
 <div id="content">
@@ -69,7 +62,7 @@
                         @foreach (var product in products)
                         {
                             <tr>
-                                <td><a href="order-detail.html?id=@product.ProductId">#@product.ProductId</a></td>
+                                <td><a asp-controller="Admin" asp-action="Update" asp-route-id="@product.ProductId">#@product.ProductId</a></td>
                                 <td>@product.ProductName</td>
                                 <td>@product.UnitPrice</td>
                                 <td>pieces</td>
@@ -82,72 +75,7 @@
                                 </td>
                             </tr>
                         }
-
-                        @*<tr>
-                        <td><a href="order-detail.html?id=5">#5</a></td>
-                        <td>IPhone 14 Pro Max</td>
-                        <td>2000</td>
-                        <td>pieces</td>
-                        <td>50</td>
-                        <td>Smart Phone</td>
-                        <td>false</td>
-                        <td>
-                        <a href="edit.html?id=5">Edit</a> &nbsp; | &nbsp;
-                        <a href="delete.html?id=5">Delete</a>
-                        </td>
-                        </tr>
-                        <tr>
-                        <td><a href="order-detail.html?id=5">#4</a></td>
-                        <td>IPhone 13 Pro Max</td>
-                        <td>1000</td>
-                        <td>pieces</td>
-                        <td>100</td>
-                        <td>Smart Phone</td>
-                        <td>false</td>
-                        <td>
-                        <a href="edit.html?id=5">Edit</a> &nbsp; | &nbsp;
-                        <a href="delete.html?id=5">Delete</a>
-                        </td>
-                        </tr>
-                        <tr>
-                        <td><a href="order-detail.html?id=5">#3</a></td>
-                        <td>Macbook Pro 2021</td>
-                        <td>2100</td>
-                        <td>pieces</td>
-                        <td>20</td>
-                        <td>Labtop</td>
-                        <td>false</td>
-                        <td>
-                        <a href="edit.html?id=5">Edit</a> &nbsp; | &nbsp;
-                        <a href="delete.html?id=5">Delete</a>
-                        </td>
-                        </tr>
-                        <tr>
-                        <td><a href="order-detail.html?id=5">#2</a></td>
-                        <td>Dell XPS</td>
-                        <td>2000</td>
-                        <td>pieces</td>
-                        <td>30</td>
-                        <td>Labtop</td>
-                        <td>false</td>
-                        <td>
-                        <a href="edit.html?id=5">Edit</a> &nbsp; | &nbsp;
-                        <a href="delete.html?id=5">Delete</a>
-                        </td>
-                        </tr>
-                        <tr>
-                        <td><a href="order-detail.html?id=5">#1</a></td>
-                        <td>Bosh Wash</td>
-                        <td>1000</td>
-                        <td>pieces</td>
-                        <td>10</td>
-                        <td>Electronic</td>
-                        <td>false</td>
-                        <td>
-                        <a href="edit.html?id=5">Edit</a> &nbsp; | &nbsp;
-                        <a href="delete.html?id=5">Delete</a>
-                        </td>
-                        </tr>*@
+                        
                     </table>
                 </div>
                 <div id="paging">

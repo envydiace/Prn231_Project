@@ -40,7 +40,7 @@ namespace Prm231_Project.Controllers
                 if (acc != null)
                 {
                     //create claims details based on the user information
-                    var result = await this.GenerateToken(acc.AccountId);
+                    var result = await this.GenerateToken(acc.AccountId,false);
                     return Ok(result);
                 }
                 else
@@ -76,11 +76,11 @@ namespace Prm231_Project.Controllers
                 return BadRequest("Refresh Token expired!"); ;
             }
 
-            var result = await this.GenerateToken(refreshTokenRequest.AccountId);
+            var result = await this.GenerateToken(refreshTokenRequest.AccountId,true);
 
             return Ok(result);
         }
-        private async Task<TokenDTO> GenerateToken(int accountId)
+        private async Task<TokenDTO> GenerateToken(int accountId, bool refresh)
         {
             var acc = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountId == accountId);
             var claims = new[] {
@@ -104,26 +104,37 @@ namespace Prm231_Project.Controllers
                 _configuration["Jwt:Issuer"],
                 _configuration["Jwt:Audience"],
                 claims,
-                expires: DateTime.Now.AddSeconds(20),
+                expires: DateTime.Now.AddSeconds(10),
                 signingCredentials: signIn);
 
             var refreshToken = await this.GenerateRefreshToken();
-            if (acc.RefreshTokens != null && acc.RefreshTokens.Any())
+            if (refresh)
             {
                 var reToken = await _context.RefreshTokens.FirstOrDefaultAsync(t => t.AccountId == acc.AccountId);
-                _context.RefreshTokens.Remove(reToken);
+                reToken.RefreshToken1 = refreshToken;
+                _context.Update<RefreshToken>(reToken);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                if (acc.RefreshTokens != null && acc.RefreshTokens.Any())
+                {
+                    var reToken = await _context.RefreshTokens.FirstOrDefaultAsync(t => t.AccountId == acc.AccountId);
+                    _context.RefreshTokens.Remove(reToken);
+                    await _context.SaveChangesAsync();
+                }
+
+                var reFreshToken = new RefreshToken
+                {
+                    AccountId = acc.AccountId,
+                    CreatedDate = DateTime.Now,
+                    ExpiryDate = DateTime.Now.AddMinutes(15),
+                    RefreshToken1 = refreshToken
+                };
+                _context.RefreshTokens.Add(reFreshToken);
                 await _context.SaveChangesAsync();
             }
 
-            var reFreshToken = new RefreshToken
-            {
-                AccountId = acc.AccountId,
-                CreatedDate = DateTime.Now,
-                ExpiryDate = DateTime.Now.AddMinutes(15),
-                RefreshToken1 = refreshToken
-            };
-            _context.RefreshTokens.Add(reFreshToken);
-            await _context.SaveChangesAsync();
 
             var result = new TokenDTO
             {
@@ -243,13 +254,10 @@ namespace Prm231_Project.Controllers
             return Ok(new { CustomerId, EmployeeId, AccountId, Role, Email });
         }
 
-        [Authorize]
         [HttpGet("[action]")]
-        public IActionResult getAccountClaims()
+        public IActionResult getAccountClaims(string token)
         {
             var handler = new JwtSecurityTokenHandler();
-            var header = Request.Headers["Authorization"];
-            var token = header[0].Split(" ")[1];
             var jwt = handler.ReadJwtToken(token);
             var CustomerId = jwt.Claims.First(claim => claim.Type == "CustomerId").Value;
             var EmployeeId = !jwt.Claims.First(claim => claim.Type == "EmployeeId").Value.Equals("") ?

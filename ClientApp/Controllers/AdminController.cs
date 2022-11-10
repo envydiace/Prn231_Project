@@ -25,11 +25,23 @@ namespace ClientApp.Controllers
                 string results = productResponse.Content.ReadAsStringAsync().Result;
                 List<ProductView> products = JsonConvert.DeserializeObject<List<ProductView>>(results);
                 ViewData["products"] = products;
-                
+
             }
             else if (productResponse.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
             {
-                return RedirectToAction("Login", "Permission");
+                ClaimView claim = await Calculate.GetAccountClaims(token);
+                string refreshToken = HttpContext.Session.GetString(Constants._refreshToken);
+                TokenView tokenView = await Calculate.GetRefreshToken(claim.AccountId, refreshToken);
+                if (tokenView != null)
+                {
+                    HttpContext.Session.SetString(Constants._accessToken, tokenView.AccessToken);
+                    HttpContext.Session.SetString(Constants._refreshToken, tokenView.RefreshToken);
+                    return RedirectToAction(nameof(Product), searchView);
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
             }
             else if (productResponse.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
             {
@@ -40,7 +52,6 @@ namespace ClientApp.Controllers
             {
                 return RedirectToAction("Login", "Permission");
             }
-            ViewData["token"] = HttpContext.Session.GetString(Constants._accessToken);
             return View("~/Views/Admin/Index.cshtml");
         }
 
@@ -79,7 +90,19 @@ namespace ClientApp.Controllers
                 }
                 else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
                 {
-                    return RedirectToAction("Login", "Permission");
+                    ClaimView claim = await Calculate.GetAccountClaims(token);
+                    string refreshToken = HttpContext.Session.GetString(Constants._refreshToken);
+                    TokenView tokenView = await Calculate.GetRefreshToken(claim.AccountId, refreshToken);
+                    if (tokenView != null)
+                    {
+                        HttpContext.Session.SetString(Constants._accessToken, tokenView.AccessToken);
+                        HttpContext.Session.SetString(Constants._refreshToken, tokenView.RefreshToken);
+                        return RedirectToAction(nameof(CreateProduct), product);
+                    }
+                    else
+                    {
+                        return RedirectToAction("Login", "Permission");
+                    }
                 }
                 else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
                 {
@@ -113,11 +136,26 @@ namespace ClientApp.Controllers
                 {
                     return RedirectToAction(nameof(Product));
                 }
+                else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
+                {
+                    ClaimView claim = await Calculate.GetAccountClaims(token);
+                    string refreshToken = HttpContext.Session.GetString(Constants._refreshToken);
+                    TokenView tokenView = await Calculate.GetRefreshToken(claim.AccountId, refreshToken);
+                    if (tokenView != null)
+                    {
+                        HttpContext.Session.SetString(Constants._accessToken, tokenView.AccessToken);
+                        HttpContext.Session.SetString(Constants._refreshToken, tokenView.RefreshToken);
+                        return RedirectToAction(nameof(UpdateProduct), product);
+                    }
+                    else
+                    {
+                        return RedirectToAction("Login", "Permission");
+                    }
+                }
                 else
                 {
                     return RedirectToAction("Login", "Permission");
                 }
-
             }
             else
             {
@@ -176,7 +214,19 @@ namespace ClientApp.Controllers
             }
             else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
             {
-                return RedirectToAction("Login", "Permission");
+                ClaimView claim = await Calculate.GetAccountClaims(token);
+                string refreshToken = HttpContext.Session.GetString(Constants._refreshToken);
+                TokenView tokenView = await Calculate.GetRefreshToken(claim.AccountId, refreshToken);
+                if (tokenView != null)
+                {
+                    HttpContext.Session.SetString(Constants._accessToken, tokenView.AccessToken);
+                    HttpContext.Session.SetString(Constants._refreshToken, tokenView.RefreshToken);
+                    return RedirectToAction(nameof(Order), searchView);
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
             }
             else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
             {
@@ -203,7 +253,19 @@ namespace ClientApp.Controllers
             }
             else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
             {
-                return RedirectToAction("Login", "Permission");
+                ClaimView claim = await Calculate.GetAccountClaims(token);
+                string refreshToken = HttpContext.Session.GetString(Constants._refreshToken);
+                TokenView tokenView = await Calculate.GetRefreshToken(claim.AccountId, refreshToken);
+                if (tokenView != null)
+                {
+                    HttpContext.Session.SetString(Constants._accessToken, tokenView.AccessToken);
+                    HttpContext.Session.SetString(Constants._refreshToken, tokenView.RefreshToken);
+                    return RedirectToAction(nameof(CancelOrder), id);
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
             }
             else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
             {
@@ -228,7 +290,19 @@ namespace ClientApp.Controllers
             }
             else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
             {
-                return RedirectToAction("Login", "Permission");
+                ClaimView claim = await Calculate.GetAccountClaims(token);
+                string refreshToken = HttpContext.Session.GetString(Constants._refreshToken);
+                TokenView tokenView = await Calculate.GetRefreshToken(claim.AccountId, refreshToken);
+                if (tokenView != null)
+                {
+                    HttpContext.Session.SetString(Constants._accessToken, tokenView.AccessToken);
+                    HttpContext.Session.SetString(Constants._refreshToken, tokenView.RefreshToken);
+                    return RedirectToAction(nameof(OrderDetail), id);
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
             }
             else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
             {
@@ -253,6 +327,22 @@ namespace ClientApp.Controllers
                 ViewData["dashboard"] = dashboard;
 
             }
+            else if (dashboardResponse.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
+            {
+                ClaimView claim = await Calculate.GetAccountClaims(token);
+                string refreshToken = HttpContext.Session.GetString(Constants._refreshToken);
+                TokenView tokenView = await Calculate.GetRefreshToken(claim.AccountId, refreshToken);
+                if (tokenView != null)
+                {
+                    HttpContext.Session.SetString(Constants._accessToken, tokenView.AccessToken);
+                    HttpContext.Session.SetString(Constants._refreshToken, tokenView.RefreshToken);
+                    return RedirectToAction(nameof(Dashboard), year);
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
+            }
             else
             {
                 return RedirectToAction("Login", "Permission");
@@ -265,6 +355,22 @@ namespace ClientApp.Controllers
                 List<int> orders = JsonConvert.DeserializeObject<List<int>>(results);
                 ViewData["orders"] = results;
 
+            }
+            else if (dashboardResponse.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
+            {
+                ClaimView claim = await Calculate.GetAccountClaims(token);
+                string refreshToken = HttpContext.Session.GetString(Constants._refreshToken);
+                TokenView tokenView = await Calculate.GetRefreshToken(claim.AccountId, refreshToken);
+                if (tokenView != null)
+                {
+                    HttpContext.Session.SetString(Constants._accessToken, tokenView.AccessToken);
+                    HttpContext.Session.SetString(Constants._refreshToken, tokenView.RefreshToken);
+                    return RedirectToAction(nameof(Dashboard), year);
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
             }
             else
             {
@@ -280,8 +386,7 @@ namespace ClientApp.Controllers
             {
                 string results = productResponse.Content.ReadAsStringAsync().Result;
                 return JsonConvert.DeserializeObject<ProductEdit>(results);
-            }
-            else
+            }            else
             {
                 Console.WriteLine("Error Calling web API");
                 return null;

@@ -10,11 +10,11 @@
 <div id="content">
     <div id="content-left">
         <ul>
-            <a href="dashboard.html">
+            <a asp-action="Dashboard" asp-controller="Admin">
             <li>Dashboard</li></a>
-            <a href="order.html">
+            <a asp-action="Order" asp-controller="Admin">
             <li>Orders</li></a>
-            <a href="product.html">
+            <a asp-action="Product" asp-controller="Admin">
             <li>Products</li></a>
             <a href="#">
             <li>Customers</li></a>
@@ -60,7 +60,7 @@
                     <input type="text" asp-for="UnitsOnOrder" disabled><br />
                     <label>Discontinued:</label><br />
                     @Html.CheckBoxFor(p => p.Discontinued)
-                    <br/>
+                    <br />
                     <input type="submit" value="Save" />
                 </div>
             </form>

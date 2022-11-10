@@ -18,6 +18,21 @@ namespace ClientApp.Controllers
             ViewData["error"] = error;
             return View("~/Views/Login.cshtml");
         }
+        public async Task<IActionResult> Logout(string token)
+        {
+            using (var Client = new HttpClient())
+            {
+               HttpResponseMessage response = await Calculate.callPostApi("Logout",token,null);
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction(nameof(Login));
+                }
+                else
+                {
+                    return RedirectToAction(nameof(Login));
+                }
+            }
+        }
 
         public async Task<ActionResult> LoginAccount(LoginView loginView)
         {

@@ -1,8 +1,10 @@
-﻿
-@{
+﻿@{
     var cart = Context.Session.GetString(Constants._cartKey);
     var token = Context.Session.GetString(Constants._accessToken);
     var isAdmin = Context.Session.GetString(Constants._isAdmin);
+    var accessToken = Context.Session.GetString(Constants._accessToken);
+    var refreshToken = Context.Session.GetString(Constants._refreshToken);
+    var getToken = "";
 }
 
 <!DOCTYPE html>
@@ -15,8 +17,18 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ClientApp.styles.css" asp-append-version="true" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
+    @if (accessToken != null)
+    {
+        <script>
+            localStorage.setItem("access", '@accessToken');
+            localStorage.setItem("refreshToken", '@refreshToken');
+        </script>
+    }
+
     <div class="container">
         @if (isAdmin != null && isAdmin.Equals("true"))
         {
@@ -30,6 +42,7 @@
                     </ul>
                 </div>
             </div>
+
         }
         else
         {
@@ -43,21 +56,17 @@
                         @if (token != null)
                         {
                             <li><a asp-action="Info" asp-controller="Customer">Profile</a></li>
-                            <li><a asp-controller="Permission" asp-action="Login">SignOut</a></li>
+                            <li><a asp-controller="Permission" asp-action="Logout" onclick="SetToken();">SignOut</a></li>
                         }
                         else
                         {
                             <li><a asp-controller="Permission" asp-action="Login">SignIn</a></li>
                             <li><a asp-action="Register" asp-controller="Permission">SignUp</a></li>
                         }
-
-
                     </ul>
                 </div>
             </div>
         }
-
-
         <main role="main" class="pb-3">
 
             @RenderBody()
@@ -70,8 +79,6 @@
             &copy; 2022 - ClientApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

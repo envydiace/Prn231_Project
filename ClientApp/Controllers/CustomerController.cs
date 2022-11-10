@@ -22,7 +22,19 @@ namespace ClientApp.Controllers
             }
             else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
             {
-                return RedirectToAction("Login", "Permission");
+                ClaimView claim = await Calculate.GetAccountClaims(token);
+                string refreshToken = HttpContext.Session.GetString(Constants._refreshToken);
+                TokenView tokenView = await Calculate.GetRefreshToken(claim.AccountId, refreshToken);
+                if (tokenView != null)
+                {
+                    HttpContext.Session.SetString(Constants._accessToken, tokenView.AccessToken);
+                    HttpContext.Session.SetString(Constants._refreshToken, tokenView.RefreshToken);
+                    return RedirectToAction(nameof(Info));
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
             }
             else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
             {
@@ -49,7 +61,19 @@ namespace ClientApp.Controllers
             }
             else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
             {
-                return RedirectToAction("Login", "Permission");
+                ClaimView claim = await Calculate.GetAccountClaims(token);
+                string refreshToken = HttpContext.Session.GetString(Constants._refreshToken);
+                TokenView tokenView = await Calculate.GetRefreshToken(claim.AccountId, refreshToken);
+                if (tokenView != null)
+                {
+                    HttpContext.Session.SetString(Constants._accessToken, tokenView.AccessToken);
+                    HttpContext.Session.SetString(Constants._refreshToken, tokenView.RefreshToken);
+                    return RedirectToAction(nameof(Order));
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
             }
             else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
             {
@@ -77,7 +101,19 @@ namespace ClientApp.Controllers
             }
             else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
             {
-                return RedirectToAction("Login", "Permission");
+                ClaimView claim = await Calculate.GetAccountClaims(token);
+                string refreshToken = HttpContext.Session.GetString(Constants._refreshToken);
+                TokenView tokenView = await Calculate.GetRefreshToken(claim.AccountId, refreshToken);
+                if (tokenView != null)
+                {
+                    HttpContext.Session.SetString(Constants._accessToken, tokenView.AccessToken);
+                    HttpContext.Session.SetString(Constants._refreshToken, tokenView.RefreshToken);
+                    return RedirectToAction(nameof(OrderCanceled));
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Permission");
+                }
             }
             else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Forbidden))
             {
