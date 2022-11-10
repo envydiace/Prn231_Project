@@ -8,8 +8,6 @@ namespace ClientApp.Controllers
 {
     public class HomeController : Controller
     {
-        public string baseUrl = "http://localhost:5000/api/";
-
         public async Task<IActionResult> Index(HomeFilterView filter)
         {
             var categories = await Calculate.GetAllCategory();
@@ -40,8 +38,6 @@ namespace ClientApp.Controllers
             {
                 return RedirectToAction("Login", "Permission");
             }
-
-
 
             HttpResponseMessage productNewResponse = await Calculate.callGetApi("Product/GetProductNew?categoryId=" + filter.CategoryId + "&pageIndex=" + filter.pageNew + "&pageSize=4");
             if (productHotResponse.IsSuccessStatusCode)

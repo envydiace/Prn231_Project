@@ -9,29 +9,21 @@ namespace ClientApp.Controllers
 {
     public class CartController : Controller
     {
-        public string baseUrl = "http://localhost:5000/api/";
         public async Task<IActionResult> CustomerCart(string check)
         {
-            string token = HttpContext.Session.GetString("token");
+            string token = HttpContext.Session.GetString(Constants._accessToken);
             if (token != null)
             {
-                using (var Client = new HttpClient())
+                HttpResponseMessage response = await Calculate.callGetApi("Customer/GetCustomer", token);
+                if (response.IsSuccessStatusCode)
                 {
-                    Client.BaseAddress = new Uri(baseUrl);
-                    Client.DefaultRequestHeaders.Accept.Clear();
-                    Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
-                    HttpResponseMessage response = await Client.GetAsync("Customer/GetCustomer");
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string results = response.Content.ReadAsStringAsync().Result;
-                        CustomerInfoView cus = JsonConvert.DeserializeObject<CustomerInfoView>(results);
-                        ViewData["customerInfo"] = cus;
-                    }
-                    else
-                    {
-                        return RedirectToAction("Login", "Permission");
-                    }
+                    string results = response.Content.ReadAsStringAsync().Result;
+                    CustomerInfoView cus = JsonConvert.DeserializeObject<CustomerInfoView>(results);
+                    ViewData["customerInfo"] = cus;
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Permission");
                 }
             }
             if (check != null)
@@ -154,10 +146,10 @@ namespace ClientApp.Controllers
                 RequiredDate = new DateTime(now.Year, now.Month, now.Day + 2),
                 Items = this.GetCustomerCart()
             };
-            string token = HttpContext.Session.GetString("token");
+            string token = HttpContext.Session.GetString(Constants._accessToken);
             using (var Client = new HttpClient())
             {
-                Client.BaseAddress = new Uri(baseUrl);
+                Client.BaseAddress = new Uri(Constants._baseUrl);
                 Client.DefaultRequestHeaders.Accept.Clear();
                 Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 if (token != null)
@@ -167,10 +159,11 @@ namespace ClientApp.Controllers
                 HttpResponseMessage response = await Client.PostAsJsonAsync("Cart/OrderCart", orderCart);
                 if (response.IsSuccessStatusCode)
                 {
-                    
+
                     ClearCart();
-                    return RedirectToAction(nameof(CustomerCart),new {check = "Success"});
-                }else
+                    return RedirectToAction(nameof(CustomerCart), new { check = "Success" });
+                }
+                else
                 {
                     return RedirectToAction(nameof(CustomerCart), new { check = "Fail" });
                 }
