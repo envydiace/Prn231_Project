@@ -4,7 +4,6 @@
     var isAdmin = Context.Session.GetString(Constants._isAdmin);
     var accessToken = Context.Session.GetString(Constants._accessToken);
     var refreshToken = Context.Session.GetString(Constants._refreshToken);
-    var getToken = "";
 }
 
 <!DOCTYPE html>
@@ -38,7 +37,13 @@
                 </div>
                 <div id="banner-admin">
                     <ul>
-                        <li><a asp-controller="Permission" asp-action="Login">SignOut</a></li>
+                        @*<li><a asp-controller="Permission" asp-action="Login">SignOut</a></li>*@
+                        <li>
+                            <form id="form-id" asp-controller="Permission" asp-action="Logout">
+                                <input hidden value="@accessToken" id="token" name="token" />
+                                <a style="text-decoration:underline;" onclick="document.getElementById('form-id').submit();"> SignOut </a>
+                            </form>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -56,7 +61,12 @@
                         @if (token != null)
                         {
                             <li><a asp-action="Info" asp-controller="Customer">Profile</a></li>
-                            <li><a asp-controller="Permission" asp-action="Logout" onclick="SetToken();">SignOut</a></li>
+                            <li>
+                                <form id="form-id" asp-controller="Permission" asp-action="Logout">
+                                    <input hidden value="@accessToken" id="token" name="token" />
+                                    <a style="text-decoration:underline;" onclick="document.getElementById('form-id').submit();"> SignOut </a>
+                                </form>
+                            </li>
                         }
                         else
                         {

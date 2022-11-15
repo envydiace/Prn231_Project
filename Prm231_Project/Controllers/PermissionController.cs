@@ -104,7 +104,7 @@ namespace Prm231_Project.Controllers
                 _configuration["Jwt:Issuer"],
                 _configuration["Jwt:Audience"],
                 claims,
-                expires: DateTime.Now.AddSeconds(10),
+                expires: DateTime.Now.AddMinutes(1),
                 signingCredentials: signIn);
 
             var refreshToken = await this.GenerateRefreshToken();

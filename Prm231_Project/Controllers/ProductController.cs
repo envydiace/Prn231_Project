@@ -136,6 +136,27 @@ namespace Prm231_Project.Controllers
             }
         }
 
+        //[Authorize(Policy = "AdminOnly")]
+        [HttpPost("[action]")]
+        public async Task<IActionResult> CreateMulti(List<ProductAddDTO >product)
+        {
+            if (ModelState.IsValid)
+            {
+                var products = mapper.Map<List<Product>>(product);
+                foreach(var p in products)
+                {
+                    await _context.AddAsync<Product>(p);
+                    _context.SaveChanges();
+                }
+               
+                return CreatedAtAction("Get", new { id = (products != null ? products.FirstOrDefault()!=null? products.FirstOrDefault().ProductId:0 : 0) }, products.FirstOrDefault());
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
+        }
+
         [Authorize(Policy = "AdminOnly")]
         [HttpDelete("[action]/{id}")]
         public async Task<ActionResult<string>> Delete(int id)

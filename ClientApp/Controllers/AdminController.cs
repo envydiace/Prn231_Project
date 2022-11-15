@@ -4,6 +4,7 @@ using ClientApp.Models;
 using Newtonsoft.Json;
 using ClientApp.Utils;
 using System.Diagnostics;
+using OfficeOpenXml;
 
 namespace ClientApp.Controllers
 {
@@ -386,11 +387,62 @@ namespace ClientApp.Controllers
             {
                 string results = productResponse.Content.ReadAsStringAsync().Result;
                 return JsonConvert.DeserializeObject<ProductEdit>(results);
-            }            else
+            }
+            else
             {
                 Console.WriteLine("Error Calling web API");
                 return null;
             }
+        }
+
+        public async Task<ActionResult> ImportExcelFile(IFormFile file)
+        {
+            try
+            {
+                var product = new List<ProductAdd>();
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+                    using (var package = new ExcelPackage(stream))
+                    {
+                        ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                        var rowCount = worksheet.Dimension.Rows;
+                        for (int row = 2; row <= rowCount; row++)
+                        {
+                            product.Add(new ProductAdd
+                            {
+                                ProductName = worksheet.Cells[row, 1].Value.ToString().Trim(),
+                                CategoryId = Convert.ToInt32(worksheet.Cells[row, 2].Value.ToString().Trim()),
+                                QuantityPerUnit = worksheet.Cells[row, 3].Value.ToString().Trim(),
+                                UnitPrice = Convert.ToDecimal(worksheet.Cells[row, 4].Value.ToString().Trim()),
+                                UnitsInStock = short.Parse(worksheet.Cells[row, 5].Value.ToString().Trim()),
+                                UnitsOnOrder = short.Parse(worksheet.Cells[row, 6].Value.ToString().Trim()),
+                                ReorderLevel = short.Parse(worksheet.Cells[row, 7].Value.ToString().Trim()),
+                                Discontinued = Convert.ToBoolean(worksheet.Cells[row, 8].Value.ToString().Trim())
+                            });
+                        }
+                        ViewData["excelList"] = product;
+                    }
+
+                    HttpResponseMessage response = await Calculate.callPostApi("Product/CreateMulti", product);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction(nameof(Product));
+                    }
+                    else
+                    {
+                        ViewData["error"] = "Import product fail!";
+                        return View("~/Views/Admin/Error.cshtml");
+                    }
+
+                }
+            }
+            catch (Exception)
+            {
+                ViewData["error"] = "Import product fail!";
+                return View("~/Views/Admin/Error.cshtml");
+            }
+
         }
 
     }
