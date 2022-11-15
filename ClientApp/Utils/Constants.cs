@@ -8,5 +8,10 @@
         public static string _refreshToken = "refreshToken";
         public static string _isAdmin = "isAdmin";
         public static string _cusName = "cusName";
+
+        public static class ErrorMessage
+        {
+            public static string SomeThingHappend = "Something happend!";
+        }
     }
 }

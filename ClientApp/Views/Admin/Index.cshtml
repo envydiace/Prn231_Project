@@ -41,8 +41,7 @@
                     </div>
                     <div id="product-title-3" style="width: 20%;">
                         <a asp-controller="Admin" asp-action="Create">Create a new Product</a>
-                        <form method="post" asp-controller="Admin" asp-action="ImportExcelFile" enctype="multipart/form-data">
-                            
+                        <form asp-controller="Admin" asp-action="ImportExcelFile" enctype="multipart/form-data">
                             <input type="file" name="file"  />
                             <button type="submit">Import</button>
                         </form>

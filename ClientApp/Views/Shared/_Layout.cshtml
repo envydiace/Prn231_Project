@@ -41,7 +41,7 @@
                         <li>
                             <form id="form-id" asp-controller="Permission" asp-action="Logout">
                                 <input hidden value="@accessToken" id="token" name="token" />
-                                <a style="text-decoration:underline;" onclick="document.getElementById('form-id').submit();"> SignOut </a>
+                                <a style="text-decoration:underline;cursor:pointer;" onclick="document.getElementById('form-id').submit();"> SignOut </a>
                             </form>
                         </li>
                     </ul>
@@ -64,7 +64,7 @@
                             <li>
                                 <form id="form-id" asp-controller="Permission" asp-action="Logout">
                                     <input hidden value="@accessToken" id="token" name="token" />
-                                    <a style="text-decoration:underline;" onclick="document.getElementById('form-id').submit();"> SignOut </a>
+                                    <a style="text-decoration:underline;cursor:pointer;" onclick="document.getElementById('form-id').submit();"> SignOut </a>
                                 </form>
                             </li>
                         }
