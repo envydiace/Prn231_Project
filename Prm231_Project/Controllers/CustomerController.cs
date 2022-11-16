@@ -40,7 +40,7 @@ namespace Prm231_Project.Controllers
         }
         [Authorize(Policy = "CustOnly")]
         [HttpPut("[action]")]
-        public async Task<IActionResult> EditCustomerInfo([FromForm] CustomerEditDTO customerDTO)
+        public async Task<IActionResult> EditCustomerInfo(CustomerEditDTO customerDTO)
         {
             var CustomerId = GetCustomerID();
             var cus = await _context.Customers.Where(c => c.CustomerId.Equals(CustomerId)).AsNoTracking().FirstOrDefaultAsync();

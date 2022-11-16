@@ -65,7 +65,6 @@ namespace ClientApp.Controllers
             {
                 return RedirectToAction("Login", "Permission", new { error = Constants.ErrorMessage.SomeThingHappend });
             }
-            
         }
 
         public async Task<ActionResult> Create()

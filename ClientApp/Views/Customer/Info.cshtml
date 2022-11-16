@@ -1,5 +1,4 @@
-﻿
-@*
+﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
@@ -7,6 +6,7 @@
     var info = ViewData["customerInfo"] as CustomerInfoView;
     var cusName = Context.Session.GetString(Constants._cusName);
 }
+@model CustomerInfoView
 <div id="content">
     <div id="content-left">
         <h3 style="font-weight: normal;">Welcome, @cusName</h3>
@@ -31,7 +31,8 @@
                     <div>Company name: <br />@info.CompanyName</div>
                     <div>Contact name: <br />@info.ContactName</div>
                     <div>
-                        <a  asp-action="Index" asp-controller="Test" class="btn btn-danger" > Edit Info</a>
+                        <a asp-action="Edit" asp-controller="Customer" class="btn btn-danger"> Edit Info</a>
+                        <a asp-action="ChangePass" asp-controller="Permission" class="btn btn-danger">Change Password</a>
                     </div>
                 </div>
                 <div class="profile-content-col">

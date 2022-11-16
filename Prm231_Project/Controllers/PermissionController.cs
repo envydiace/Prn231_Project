@@ -40,7 +40,7 @@ namespace Prm231_Project.Controllers
                 if (acc != null)
                 {
                     //create claims details based on the user information
-                    var result = await this.GenerateToken(acc.AccountId,false);
+                    var result = await this.GenerateToken(acc.AccountId, false);
                     return Ok(result);
                 }
                 else
@@ -76,7 +76,7 @@ namespace Prm231_Project.Controllers
                 return BadRequest("Refresh Token expired!"); ;
             }
 
-            var result = await this.GenerateToken(refreshTokenRequest.AccountId,true);
+            var result = await this.GenerateToken(refreshTokenRequest.AccountId, true);
 
             return Ok(result);
         }
@@ -90,7 +90,6 @@ namespace Prm231_Project.Controllers
                         new Claim("AccountId", acc.AccountId.ToString()),
                         new Claim("Password", acc.Password),
                         new Claim("Email", acc.Email),
-                        new Claim("Password", acc.Password),
                         new Claim("CustomerId", acc.CustomerId!=null?acc.CustomerId:""),
                         new Claim("EmployeeId", acc.EmployeeId.ToString()),
                         new Claim("Role", acc.Role.ToString())
@@ -303,6 +302,33 @@ namespace Prm231_Project.Controllers
         public IActionResult SendMail(EmailDTO emailDTO)
         {
             _emailService.SendEmail(emailDTO);
+            return Ok();
+        }
+
+        [HttpPost("[action]")]
+        [Authorize]
+        public async Task<IActionResult> ChangePass(ChangePassDTO dto)
+        {
+            var header = Request.Headers["Authorization"];
+            var token = header[0].Split(" ")[1];
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(token);
+            var accountId = Convert.ToInt32(jwt.Claims.First(claim => claim.Type == "AccountId").Value);
+            var account = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountId == accountId);
+            if (account == null)
+            {
+                return BadRequest("Account doesn't exist!");
+            }
+            if (!account.Password.Equals(dto.OldPassword))
+            {
+                return BadRequest("Old password incorrect!");
+            }
+            if (dto.NewPassword.Equals(dto.OldPassword))
+            {
+                return BadRequest("New password can't match old password!");
+            }
+            account.Password = dto.NewPassword;
+            await _context.SaveChangesAsync();
             return Ok();
         }
 

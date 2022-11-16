@@ -22,7 +22,7 @@ namespace ClientApp.Controllers
         {
             using (var Client = new HttpClient())
             {
-               HttpResponseMessage response = await Calculate.callPostApi("Logout",token,null);
+                HttpResponseMessage response = await Calculate.callPostApi("Logout", token, null);
                 if (response.IsSuccessStatusCode)
                 {
                     return RedirectToAction(nameof(Login));
@@ -94,8 +94,9 @@ namespace ClientApp.Controllers
         }
 
 
-        public IActionResult ForgotPass()
+        public IActionResult ForgotPass(string error)
         {
+            ViewData["error"] = error;
             return View("~/Views/ForgotPass.cshtml");
         }
 
@@ -113,9 +114,70 @@ namespace ClientApp.Controllers
                 }
                 else
                 {
-                    return RedirectToAction("Login", "Permission");
+                    return RedirectToAction("ForgotPass", "Permission", new { error = "Email doesn't exist!" });
                 }
             }
+        }
+
+        public IActionResult ChangePass(string error)
+        {
+            ViewData["error"] = error;
+            return View("~/Views/Customer/ChangePass.cshtml");
+        }
+
+        public async Task<IActionResult> ChangeAccountPassword(ChangePassView changePass)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return RedirectToAction(nameof(ChangePass));
+                }
+                else if (!changePass.NewPassword.Equals(changePass.ConfirmPassword))
+                {
+                    return RedirectToAction(nameof(ChangePass), new { error = "New password doesn't match confirm password!" });
+                }
+                else
+                {
+                    string token = HttpContext.Session.GetString(Constants._accessToken);
+
+                    HttpResponseMessage response = await Calculate.callPostApi("ChangePass", token, changePass);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction("Info", "Customer");
+                    }
+                    else if (response.StatusCode.Equals(System.Net.HttpStatusCode.Unauthorized))
+                    {
+                        ClaimView claim = await Calculate.GetAccountClaims(token);
+                        string refreshToken = HttpContext.Session.GetString(Constants._refreshToken);
+                        TokenView tokenView = await Calculate.GetRefreshToken(claim.AccountId, refreshToken);
+                        if (tokenView != null)
+                        {
+                            HttpContext.Session.SetString(Constants._accessToken, tokenView.AccessToken);
+                            HttpContext.Session.SetString(Constants._refreshToken, tokenView.RefreshToken);
+                            return RedirectToAction(nameof(ChangeAccountPassword), changePass);
+                        }
+                        else
+                        {
+                            return RedirectToAction("Login", "Permission");
+                        }
+                    }
+                    else if (response.StatusCode.Equals(System.Net.HttpStatusCode.BadRequest))
+                    {
+                        string error = await response.Content.ReadAsStringAsync();
+                        return RedirectToAction(nameof(ChangePass), new { error = error });
+                    }
+                    else
+                    {
+                        return RedirectToAction("Login", "Permission");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return RedirectToAction("Login", "Permission", new { error = Constants.ErrorMessage.SomeThingHappend });
+            }
+
         }
 
     }

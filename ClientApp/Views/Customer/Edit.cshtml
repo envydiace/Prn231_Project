@@ -1,0 +1,56 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Edit Profile";
+    var cusName = Context.Session.GetString(Constants._cusName);
+}
+@model CustomerEditView
+
+<div id="content">
+    <div id="content-left">
+        <h3 style="font-weight: normal;">Welcome, @cusName</h3>
+        <h3>Account Management</h3>
+        <ul>
+            <a asp-action="Info" asp-controller="Customer">
+            <li>Personal information</li></a>
+        </ul>
+        <h3>My order</h3>
+        <ul>
+            <a asp-action="Order" asp-controller="Customer">
+            <li>All orders</li></a>
+            <a asp-action="OrderCanceled" asp-controller="Customer">
+            <li>Canceled order</li></a>
+        </ul>
+    </div>
+    <div id="content-right">
+        <div id="form">
+            <div id="form-content">
+                <form asp-action="EditProfile" asp-controller="Customer">
+                    <label>Company name<span style="color: red;">*</span></label><br />
+                    <input asp-for="CompanyName" class="form-control" />
+                    <span asp-validation-for="CompanyName" class="text-danger"></span>
+
+                    <label>Contact name<span style="color: red;">*</span></label><br />
+                    <input asp-for="ContactName" class="form-control" />
+                    <span asp-validation-for="ContactName" class="text-danger"></span>
+
+                    <label>Contact title<span style="color: red;">*</span></label><br />
+                    <input asp-for="ContactTitle" class="form-control" />
+                    <span asp-validation-for="ContactTitle" class="text-danger"></span>
+
+                    <label>Address<span style="color: red;">*</span></label><br />
+                    <input asp-for="Address" class="form-control" />
+                    <span asp-validation-for="Address" class="text-danger"></span>
+
+                    <label>Email<span style="color: red;">*</span></label><br />
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+
+                    <div></div>
+                    <input type="submit" value="Save" style="margin-bottom: 30px;" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

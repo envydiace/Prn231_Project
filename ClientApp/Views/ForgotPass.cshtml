@@ -2,6 +2,7 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
+    var error = ViewData["error"] as string;
 }
 @model EmailView
 <div id="content">
@@ -16,6 +17,10 @@
                 <input asp-for="Email" /><br />
                 <input type="submit" value="GET PASSWORD" style="margin-bottom: 30px;" /><br />
             </form>
+            @if (error != null)
+            {
+                <div><span style="color: red;">@error</span></div>
+            }
         </div>
     </div>
 </div>
